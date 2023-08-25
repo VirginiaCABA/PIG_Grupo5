@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %} {% endblock %} Codo a Codo - Logística</title>
+    {% load static %}
+    <!--------------FAVICON--------------->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/favicon_io/apple-touch-icon.png' %}">
+    <link rel="icon" type="/img/png" sizes="32x32" href="{% static 'core/favicon_io/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/favicon_io/favicon-16x16.png' %}">
+     <!--------------FAVICON--------------->
+    <link rel="stylesheet" href="{% static 'core/styles/nosotros.css' %}">
+    <link rel="preconnect" href="{% static 'core/ttps://fonts.googleapis.com' %}">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="{% static 'core/js/footer.js' %}" type="module"></script>
+    <script src="{% static 'core/js/menu.js' %}" type="module"></script>
+    
+
+</head>
+
+<body class="grid-container">
+    <header class="header">
+        <menu id="menu"></menu>
+    </header>
+    <!-- Contenido -->
+    {% block content%} {% endblock %}
+
+    <section class="section">
+        <article class="titulo">
+            <h1>¿QUIÉNES SOMOS?</h1>
+            <h3>Nuestra experiencia nos avala</h3>
+        </article>
+        <div class="uno">
+            <article class="section_items" id="item1">
+                <img src="{% static 'core/img/camioneta.jpg' %}" alt="camiones" class="section_img" id="img_izq">
+                <div class="section_texto" id="texto_der">
+                    <p>En <b>CODO A CODO Logistica</b>, nuestra misión es “crecer con integridad y respetar
+                        sin reservas a nuestros Clientes y al grupo de personas que componen nuestra organización”.
+                        Se ha brindado soluciones de transporte operadas y
+                        de
+                        propiedad familiar en el
+                        área metropolitana de Buenos Aires durante más de 50 años.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="dos">
+            <article class="section_items" id="item2">
+                <img src="{% static 'core/img/camiones.jpg' %}" alt="camioneta" class="section_img" id="img_der">
+                <div class="section_texto" id="texto_izq">
+                    <p> Además de nuestra flota de autos,
+                        motos y
+                        camionetas de carga, tenemos camiones disponibles para entregas el mismo día. También contamos
+                        con
+                        almacenamiento, cross-docking, entregas al siguiente día hábil, entregas minoristas y entregas
+                        en
+                        camiones
+                        refrigerados.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="columna">
+
+            <div class="container">
+                <article class="section_items" id="item3">
+                    <h2>Nuestros valores</h2>
+                    <div class="video">
+                        <p>Nuestros principios</p>
+                        <br>
+                    </div>
+                    <iframe class="responsive-iframe" src="https://www.youtube.com/embed/jB13jaw_HPE?start=5"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                </article>
+            </div>
+
+            <div class="ubicacion">
+                <article class="section_items" id="item3">
+                    <h2>¿Donde estamos?</h2>
+                    <div class="ubicacion_texto">
+                        <p>Estamos ubicados en la zona del microcentro porteño</p>
+                        <br>
+                    </div>
+                    <div id="mapDiv">
+
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <aside class="aside">
+        <img class="foto_aside" src="{% static 'core/img/foto_aside.jpg' %}" alt="foto mensajero">
+    </aside>
+
+    <footer id="footer" class="footer">
+    </footer>
+    <script src="{% static 'core/js/map.js' %}"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBDaeWicvigtP9xPv919E-RNoxfvC-Hqik&callback=initMap&v=weekly"
+        defer></script>
+</body>
+
+</html>

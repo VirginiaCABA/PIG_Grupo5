@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %} {% endblock %} Codo a Codo - Logística</title>
+    {% load static %}
+    <!--------------FAVICON--------------->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/favicon_io/apple-touch-icon.png' %}">
+    <link rel="icon" type="/img/png" sizes="32x32" href="{% static 'core/favicon_io/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/favicon_io/favicon-16x16.png' %}">
+     <!--------------FAVICON--------------->
+    <link rel="stylesheet" href="{% static 'core/styles/style.css' %}">
+    <link rel="preconnect" href="{% static 'core/ttps://fonts.googleapis.com' %}">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="{% static 'core/js/footer.js' %}" type="module"></script>
+    <script src="{% static 'core/js/menu.js' %}" type="module"></script>
+    
+
+</head>
+
+<body class="grid-container">
+    <header class="header">
+        <menu id="menu"></menu>
+        <img  src="{% static 'core/img/moto_move.png' %}" class="circle">
+     </header>
+     <!-- Contenido -->
+     {% block content%} {% endblock %}
+
+
+    <section class="section">
+        <article class="titulo">
+            <h1>¿POR QUE ELEGIRNOS?</h1>
+            <h3>Responsabilidad, Eficacia y Experiencia</h3>
+            
+        </article>
+
+        <article class="section_items" id="item1">
+
+            <img src="{% static 'core/img/cronometro.png' %}" alt="velocidad" class="body_iconos">
+            <p class="texto_iconos"> Nuestra rapidez en la entrega nos destaca frente a toda la competencia.</p>
+
+        </article>
+
+        <article class="section_items" id="item2">
+
+            <img src="{% static 'core/img/pin-de-ubicacion.png' %}" alt="pin de ubicacion" class="body_iconos">
+            <p class="texto_iconos"> Nuestros mensajeros retirarán sus envíos y podrá hacer seguimiento en tiempo real.</p>
+
+        </article>
+
+        <article class="section_items" id="item3">
+
+            <img src="{% static 'core/img/entregas.png' %}" alt="entrega" class="body_iconos">
+            <p class="texto_iconos">Las entregas son realizadas en el mismo día, desde pequeños sobres hasta grandes paquetes.</p>
+
+        </article>
+
+        <article class="section_items" id="item4">
+
+            <img src="{% static 'core/img/logistica.png' %}" alt="logistica" class="body_iconos">
+            <p class="texto_iconos"> Verificación de entrega instantánea a través de las captura de firmas en tiempo real.</p>
+
+        </article>
+        
+    </section>
+
+    <aside class="aside">
+        <img class="foto_aside" src="{% static 'core/img/foto_aside.jpg' %}" alt="foto mensajero">
+    </aside>
+
+    <footer id="footer" class="footer">
+    </footer>
+</body>
+
+</html>
