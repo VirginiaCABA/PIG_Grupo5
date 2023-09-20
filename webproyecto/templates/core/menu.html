@@ -19,7 +19,7 @@
         <li><a href="{% url 'contacto' %}">Contacto</a></li>
         {% if request.user.is_authenticated %}
             <li><a href="{% url 'clientes' %}">Clientes</a></li>
-            <li><a href="{% url 'empleados' %}">Empleados</a></li>
+            <li><a href="{% url 'empleados' fecha='2023-09-20' %}">Empleados</a></li>
             <li><a href="/admin">Administración</a></li>
             <li><a href="{% url 'exit' %}">Salir</a></li>
         {% else %}
