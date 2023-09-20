@@ -27,9 +27,8 @@ def clientes(request):
     return render(request ,"core/clientes.html")
 
 @login_required
-def empleados(request):
+def empleados(request, fecha):
     '''Recibe los datos del usuario y devuelve la vista de empleados.'''
-    fecha = datetime.now()
     pedidos = {
         'headers' : 
             [ 'Fecha pedido', 'Descripción', 'Lugar de Entrega' ],
