@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+
+{% block content%} 
+
+    <section class="section">
+        <article class="titulo">
+            <h1>¿POR QUE ELEGIRNOS?</h1>
+            <h3>Responsabilidad, Eficacia y Experiencia</h3>
+            
+        </article>
+
+        <article class="section_items" id="item1">
+
+            <img src="{% static 'core/img/cronometro.png' %}" alt="velocidad" class="body_iconos">
+            <p class="texto_iconos"> Nuestra rapidez en la entrega nos destaca frente a toda la competencia.</p>
+
+        </article>
+
+        <article class="section_items" id="item2">
+
+            <img src="{% static 'core/img/pin-de-ubicacion.png' %}" alt="pin de ubicacion" class="body_iconos">
+            <p class="texto_iconos"> Nuestros mensajeros retirarán sus envíos y podrá hacer seguimiento en tiempo real.</p>
+
+        </article>
+
+        <article class="section_items" id="item3">
+
+            <img src="{% static 'core/img/entregas.png' %}" alt="entrega" class="body_iconos">
+            <p class="texto_iconos">Las entregas son realizadas en el mismo día, desde pequeños sobres hasta grandes paquetes.</p>
+
+        </article>
+
+        <article class="section_items" id="item4">
+
+            <img src="{% static 'core/img/logistica.png' %}" alt="logistica" class="body_iconos">
+            <p class="texto_iconos"> Verificación de entrega instantánea a través de las captura de firmas en tiempo real.</p>
+
+        </article>
+        
+    </section>
+
+{% endblock %}
+

@@ -1,0 +1,29 @@
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'core/styles/menu.css' %}">
+    <script src="{% static 'core/js/menu.js' %}"></script>
+{% endblock %}
+
+<nav>
+    {% if request.user.is_authenticated %}
+        <div class="menu-icon">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    {% endif %}
+    <ul class="menu">
+        <li><a href="{% url 'nosotros' %}">Nosotros</a></li>        
+        <li><a href="{% url 'servicios' %}">Servicios</a></li>
+        <li><a href="{% url 'contacto' %}">Contacto</a></li>
+        {% if request.user.is_authenticated %}
+            <li><a href="{% url 'clientes' %}">Clientes</a></li>
+            <li><a href="{% url 'empleados' %}">Empleados</a></li>
+            <li><a href="/admin">Administración</a></li>
+            <li><a href="{% url 'exit' %}">Salir</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Ingresar</a></li>
+        {% endif %}
+    </ul>
+</nav>

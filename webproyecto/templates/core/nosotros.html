@@ -1,0 +1,80 @@
+{% extends 'core/base.html' %}
+
+{% block title %} Codo a Codo - Logística - Nosotros {% endblock %}
+
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'core/styles/nosotros.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <section class="section">
+        <article class="titulo">
+            <h1>¿QUIÉNES SOMOS?</h1>
+            <h3>Nuestra experiencia nos avala</h3>
+        </article>
+        <div class="uno">
+            <article class="section_items" id="item1">
+                <img src="../img/camioneta.jpg" alt="camiones" class="section_img" id="img_izq">
+                <div class="section_texto" id="texto_der">
+                    <p>En <b>CODO A CODO Logistica</b>, nuestra misión es “crecer con integridad y respetar
+                        sin reservas a nuestros Clientes y al grupo de personas que componen nuestra organización”.
+                        Se ha brindado soluciones de transporte operadas y
+                        de
+                        propiedad familiar en el
+                        área metropolitana de Buenos Aires durante más de 50 años.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="dos">
+            <article class="section_items" id="item2">
+                <img src="../img/camiones.jpg" alt="camioneta" class="section_img" id="img_der">
+                <div class="section_texto" id="texto_izq">
+                    <p> Además de nuestra flota de autos,
+                        motos y
+                        camionetas de carga, tenemos camiones disponibles para entregas el mismo día. También contamos
+                        con
+                        almacenamiento, cross-docking, entregas al siguiente día hábil, entregas minoristas y entregas
+                        en
+                        camiones
+                        refrigerados.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="columna">
+
+            <div class="container">
+                <article class="section_items" id="item3">
+                    <h2>Nuestros valores</h2>
+                    <div class="video">
+                        <p>Nuestros principios</p>
+                        <br>
+                    </div>
+                    <iframe class="responsive-iframe" src="https://www.youtube.com/embed/jB13jaw_HPE?start=5"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                </article>
+            </div>
+
+            <div class="ubicacion">
+                <article class="section_items" id="item3">
+                    <h2>¿Donde estamos?</h2>
+                    <div class="ubicacion_texto">
+                        <p>Estamos ubicados en la zona del microcentro porteño</p>
+                        <br>
+                    </div>
+                    <div id="mapDiv">
+
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
