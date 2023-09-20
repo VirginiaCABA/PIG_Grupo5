@@ -1,0 +1,17 @@
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'core/styles/header.css' %}">
+{% endblock %}
+
+<header>
+    <div class="logo">
+        <a href="{% url 'home' %}">Codo a Codo Logística</a>
+    </div>
+    <div class="row text-left">
+        {% if request.user.is_authenticated %}
+            <h4>Bienvenido, {{ user.first_name | upper }} {{ user.last_name | upper }}</h4>
+        {% endif %}
+    </div>
+    {% include 'core/menu.html' %}
+</header>

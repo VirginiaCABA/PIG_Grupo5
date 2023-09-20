@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}{% endblock %}</title>
+        {% load static %}
+        <!--------------FAVICON--------------->
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/favicon_io/apple-touch-icon.png' %}">
+        <link rel="icon" type="/img/png" sizes="32x32" href="{% static 'core/favicon_io/favicon-32x32.png' %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/favicon_io/favicon-16x16.png' %}">
+        <!--------------FAVICON--------------->
+        <link rel="stylesheet" href="{% static 'core/styles/style.css' %}">
+        <link rel="preconnect" href="{% static 'core/ttps://fonts.googleapis.com' %}">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+        <script src="{% static 'core/js/footer.js' %}" type="module"></script>
+    
+        <script src="{% static 'core/styles/style.css' %}" type="module"></script>
+
+        {% block style %} {% endblock %}
+    </head>
+    <body class="grid-container">
+        {% include 'core/header.html' %}
+        <main>
+            <br><br><br><br>
+            {% block content %} {% endblock %}
+        </main>     
+        <aside class="aside fixed-top">
+            <img class="foto_aside" src="{% static 'core/img/foto_aside.jpg' %}" alt="foto mensajero">
+        </aside>
+        <footer id="footer" class="footer">
+        </footer>
+    </body>
+</html>

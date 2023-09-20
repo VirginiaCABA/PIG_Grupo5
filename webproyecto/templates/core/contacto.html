@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+
+{% block title %} Codo a Codo - Logística - Contacto {% endblock %}
+
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'core/styles/contacto.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <section class="section">
+        <article class="titulo">
+            
+            <h1>TRABAJA CON NOSOTROS</h1>
+            <h3>El trabajo en equipo hace que los sueños se cumplan.</h3>
+        </article>
+        <main class="formulario">
+            <form action="#" id="form">
+                <table>
+                    <tr>
+                        <td id="tdNombre"><label for="NombreDeUsuario">Nombre:</label></td>
+                        <td id="tdInput"><input class="form-input inputtex"  type="text" id="name" name="name" placeholder="Nombre"  minlength="2" required /><p id="errorName"></p></td>
+                        <td id="tdNombre"><label for="ApellidoDeUsuario">Apellido:</label></td>
+                        <td id="tdInput"><input class="form-input inputtex" type="text" id="lastname" name="lastname" placeholder="Apellido"  minlength="2" required /><p id="errorLastname"></p></td>
+                    </tr>
+                    <tr>
+                        <td  id="tdNombre"><label for="correoElectronico">DNI:</label></td>
+                        <td id="tdInput"><input class="form-input inputtex" pattern="[0-9]{8}" title="Debe poner 8 números" minlength="8" maxlength="8" id="DNI" name="DNI" placeholder="DNI" required /><p id="errorDNI"></p></td>
+                        <td  id="tdNombre"><label for="correoElectronico">Mail:</label></td>
+                        <td id="tdInput"><input class="form-input inputtex" pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-zA-Z]{2,4}"  type="email" id="email" name="email" placeholder="abc@gmail.com" required /><p id="errorMail"></p></td>
+                    </tr>
+
+
+                </table>
+                <div class="coment">
+                    <label for="message">¿Por qué queres trabajar con nosotros?</label>
+                    <i class="far fa-envelope"></i>
+                    <textarea class="form-input"  placeholder=" " name="message" id="message" cols="30" rows="10" minlength="2" required></textarea>
+                    <p id="errorMSG"></p>
+                    <i class="fas fa-exclamation-circle failure-icon"></i>
+                    <i class="far fa-check-circle success-icon"></i>
+                    <div class="error"></div>
+                </div>
+
+                <div>
+                    <label for="curriculum">Ingrese su Curriculum</label>
+                    <i class="far fa-envelope"></i>
+                    <input type="file" id="file" name="curriculum" aria-label="Curriculum" required />
+                    <p id="errorFile"></p>
+                    <i class="fas fa-exclamation-circle failure-icon"></i>
+                    <i class="far fa-check-circle success-icon"></i>
+                    <div class="error"></div>
+                </div>
+
+                <button id="btn" class="form-button" type="submit" value="registro" onclick="registro()">Enviar</button>
+            </form>
+            <a href="mailto:virginiav@gmail.com" id="correo">mail</a>
+
+        </main>
+    </section>
+
+{% endblock %}

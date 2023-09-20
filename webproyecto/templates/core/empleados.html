@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+
+{% block title %} Codo a Codo - Logística - Empleados {% endblock %}
+
+{% load static %}
+
+{% load custom_filters %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'core/styles/empleados.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    {% if pedidos %}
+        <br><h3>Panel de Empleados</h3>
+        <br><p>Éstas son las entregas que tiene asignadas al {{ fecha|format_date }}.</p><br>
+        <table class="table table-responsive w-100">
+            <thead>
+                <tr>
+                    {% for header in pedidos.headers %}
+                        <td>{{ header }}</td>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in pedidos.rows %}
+                    <tr>
+                        {% for col in row %}
+                            <td>{{ col }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Por ahora no tiene entregas asignadas.</p>
+    {% endif %}
+
+{% endblock %}
