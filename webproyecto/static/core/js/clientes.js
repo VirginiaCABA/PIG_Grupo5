@@ -1,49 +1,48 @@
-const url = 'https://jsonplaceholder.typicode.com/posts';
-
-const respuesta=document.querySelector("#respuesta")
-const respuesta2=document.querySelector("#respuesta2")
-
-document.addEventListener("DOMContentLoaded", llamarApi)
-
-function llamarApi(){
-  fetch(url)
-    .then(response => response.json())
-    .then((datos) => mostrarHTML(datos))
-         
+// Despliega cada menu al hacer click en el signo "+" y lo cierra al hacer click en el signo "-"
+function showAndHide(param){
+    var selection = document.getElementById(param);  
+    if (selection.style.display == 'none') {
+        selection.style.display = 'block';
+    } else {
+        selection.style.display = 'none';
+    }
+    let prevSiblings = selection.previousElementSibling;
+    let icon = prevSiblings.children[1];
+    if(icon.innerHTML == "+"){
+        icon.innerHTML = "-"
+    }
+    else{
+        icon.innerHTML = "+"
+    }
 }
-
-function mostrarHTML(data){
-  let top =9;
-  let table;
-  if (data.lengt < top) {
-    top = data.lengt
-  } 
-  for (let i = 0; i < top; i++) {
-    let cliente = `<td>${data[i].title}</td>`;
-    let comentario = `<td>${data[i].body}</td>`;
-    respuesta.innerHTML += `<tr>${cliente + comentario}</tr>`;
-  };
-   
-  mostrarHTML2(data,top)
-   
+// Al elegir un radio button muestra un parrafo con el detalle del servicio
+function showRadioButtonDiv (idBaseName, numberOfButtons) {
+    for (x=1;x<=numberOfButtons;x++) {
+        checkThisButton = idBaseName + x;
+        thisDiv = idBaseName + x +'Div';
+    if (document.getElementById(checkThisButton).checked) {
+        document.getElementById(thisDiv).style.display = "block";
+        }
+    else {
+        document.getElementById(thisDiv).style.display = "none";
+        }
+    }
+    return false;
 }
-
-function mostrarHTML2(data,n){
-  let top =14;
-  let table;
-  if (n === 5 && data.lengt < top) {
-    top = data.lengt
-  } 
-  for (let i = 5; i < top; i++) {
-    let cliente = `<td>${data[i].title}</td>`;
-    let comentario = `<td>${data[i].body}</td>`;
-    respuesta2.innerHTML += `<tr>${cliente + comentario}</tr>`;
-  };  
+// Funcion para obtener los datos ingresados en cada campo para posteriormente ser mostrados al usuario y pedir su confirmacion (NO FUNCIONAL)
+function getData(form) {
+    var formData = new FormData(form);
+    console.log(Object.fromEntries(formData));
 }
+document.getElementById("myForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    getData(e.target);
+});
 
+// MODAL Bootstrap (ver sweet-alerts)
+const myModal = document.getElementById('myModal')
+const myInput = document.getElementById('myInput')
 
-
-
-
-   
-
+myModal.addEventListener('shown.bs.modal', () => {
+    myInput.focus()
+})

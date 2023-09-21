@@ -7,24 +7,24 @@ from datetime import datetime
 
 def home(request):
     '''Devuelve la vista principal del sitio.'''
-    return render(request ,"core/home.html")
+    return render(request ,"core/pages/home.html")
 
 def nosotros(request):
     '''Devuelve la section de nosotros.'''
-    return render(request ,"core/nosotros.html")
+    return render(request ,"core/pages/nosotros.html")
 
 def servicios(request):
     '''Devuelve la section de servicios.'''
-    return render(request ,"core/servicios.html")
+    return render(request ,"core/pages/servicios.html")
 
 def contacto(request):
     '''Devuelve la section de contacto.'''
-    return render(request ,"core/contacto.html")
+    return render(request ,"core/pages/contacto.html")
 
 @login_required
 def clientes(request):
     '''Recibe los datos del usuario y devuelve la vista de clientes.'''
-    return render(request ,"core/clientes.html")
+    return render(request ,"core/pages/clientes.html")
 
 @login_required
 def empleados(request, fecha):
@@ -38,7 +38,7 @@ def empleados(request, fecha):
                 [ '2012-09-14 16:51', 'Cosa 2', 'San Martín 3200' ]
             ]
     }
-    return render(request ,"core/empleados.html", { 'fecha' : fecha, 'pedidos': pedidos })
+    return render(request ,"core/pages/empleados.html", { 'fecha' : fecha, 'pedidos': pedidos })
 
 def exit(request):
     '''Cierre la sesión y envía al home'''
