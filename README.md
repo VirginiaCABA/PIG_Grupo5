@@ -4,6 +4,6 @@ Integrantes del grupo:
 1. Alejandro Ávila
 2. Rocio Román
 3. Ivan Mazurek
-4. Omar Ardilla
+4. Omar Ardila
 5. Diana Di Naro
 6. Virginia Vasquez
