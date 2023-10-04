@@ -3,10 +3,11 @@ let select = window.location.pathname
 let active=`class="active"`
 
 menu.innerHTML = `
+{% load static %}
 <nav class="contenedor">
 <div class="logo">
     <a href="/">
-        <img class="header_logo" src="${select.includes("index.html") ? "../static/core/img/logo1.png" : "../static/core/img/logo1.png"}" alt="logo">
+        <img class="header_logo" src="{% static 'core/img/logo.png' %}" alt="logo">
         <h1 class="menu">CODO A CODO Logística</h1>
     </a>
 </div>
