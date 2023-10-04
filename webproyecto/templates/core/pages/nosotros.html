@@ -1,12 +1,14 @@
-{% extends 'core/base.html' %}
-
 {% block title %} Codo a Codo - Logística - Nosotros {% endblock %}
 
 {% load static %}
 
+{% include 'core/base.html' %}
+
 {% block links %}
     <link rel="stylesheet" href="{% static 'core/styles/nosotros.css' %}">
 {% endblock %}
+
+
 
 {% block content %}
 
@@ -17,13 +19,11 @@
         </article>
         <div class="uno">
             <article class="section_items" id="item1">
-                <img src="../img/camioneta.jpg" alt="camiones" class="section_img" id="img_izq">
+                <img src="{% static 'core/img/camioneta.jpg' %}" alt="camioneta" class="section_img" id="img_izq">
                 <div class="section_texto" id="texto_der">
                     <p>En <b>CODO A CODO Logistica</b>, nuestra misión es “crecer con integridad y respetar
                         sin reservas a nuestros Clientes y al grupo de personas que componen nuestra organización”.
-                        Se ha brindado soluciones de transporte operadas y
-                        de
-                        propiedad familiar en el
+                        Se ha brindado soluciones de transporte operadas y de propiedad familiar en el
                         área metropolitana de Buenos Aires durante más de 50 años.
                     </p>
                 </div>
@@ -31,16 +31,12 @@
         </div>
         <div class="dos">
             <article class="section_items" id="item2">
-                <img src="../img/camiones.jpg" alt="camioneta" class="section_img" id="img_der">
+                <img src="{% static 'core/img/camiones.jpg' %}" alt="camiones" class="section_img" id="img_der">
                 <div class="section_texto" id="texto_izq">
-                    <p> Además de nuestra flota de autos,
-                        motos y
+                    <p> Además de nuestra flota de autos, motos y
                         camionetas de carga, tenemos camiones disponibles para entregas el mismo día. También contamos
-                        con
-                        almacenamiento, cross-docking, entregas al siguiente día hábil, entregas minoristas y entregas
-                        en
-                        camiones
-                        refrigerados.
+                        con almacenamiento, cross-docking, entregas al siguiente día hábil, entregas minoristas y entregas
+                        en camiones refrigerados.
                     </p>
                 </div>
             </article>
@@ -63,7 +59,7 @@
             </div>
 
             <div class="ubicacion">
-                <article class="section_items" id="item3">
+                <article class="section_items" id="item4">
                     <h2>¿Donde estamos?</h2>
                     <div class="ubicacion_texto">
                         <p>Estamos ubicados en la zona del microcentro porteño</p>

@@ -2,7 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-}
+} 
 
 html {
     height: 100%;
@@ -12,7 +12,7 @@ body {
     min-height: 100%;
     font-family: 'Open Sans', sans-serif;
     background-color: rgb(255, 255, 255);
-}
+}  
 
 /* DESDE ACA TENEMOS QUE CORREGIR */
 /*---------------------------------------*/
@@ -22,7 +22,7 @@ body {
     border-radius: 4px;
     padding: 10px;
     text-align: center;
-}
+} 
 
 .grid-container {
     display: grid;
@@ -204,7 +204,7 @@ body {
     padding-right: 0%;
 }
 
-.section {
+ .section {
     display: flex;
     grid-area: contenido;
     color: rgb(0, 0, 0);
@@ -216,7 +216,7 @@ body {
         "cuerpo3  cuerpo4" auto "cuerpo5  cuerpo6" auto /
         1fr 1fr;
 }
-
+ 
 .section .titulo {
     grid-area: titulo;
     display: flex;
@@ -252,14 +252,14 @@ body {
 .section #item2,
 .section #item3,
 .section #item4 {
-    box-shadow: 0px 0px 15px 6px rgba(0, 0, 0, 0.356);
-    width: 25rem;
+    box-shadow: 0px 0px 15px 6px rgba(0, 0, 0, 0.356); 
+    width: 25rem; 
     height: auto;
-    display: flex;
+    /* display: flex; */
     flex-direction: row-reverse;
     align-items: center;
     margin: .5em auto;
-    background-color: rgba(107, 174, 214);
+    background-color: rgba(107, 174, 214); */
     border-radius: .5rem;
     padding: 1em;
 }
