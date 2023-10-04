@@ -86,10 +86,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'user',
-        'PASSWORD': 'password',
+        'USER': 'postgres',
+        'PASSWORD': 'django2023',
         'HOST': 'localhost',
         'PORT': '5432',
+        'OPTIONS': {
+            'options': '-c search_path=django',
+        },
     }
 }
 
