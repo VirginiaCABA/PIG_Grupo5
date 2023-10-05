@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from datetime import datetime
+from .forms import CreateCostumerForm
 
 # Create your views here.
 
@@ -44,3 +45,14 @@ def exit(request):
     '''Cierre la sesión y envía al home'''
     logout(request)
     return redirect('home')
+
+def crear_pedido(request):
+    if (request.method == 'POST'):
+        form = CreateCostumerForm(request.POST)
+        if form.is_valid():
+            servicios = form.cleaned_data['servicios']
+            
+            # return render(request, 'success.html')
+    else:
+        form = CreateCostumerForm()
+    return render(request,"core/crear_pedido.html", {'form': form})
