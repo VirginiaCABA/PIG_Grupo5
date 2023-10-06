@@ -39,6 +39,12 @@ def solo_caracteres(value):
     if any(char.isdigit() for char in value):
         raise ValidationError('El nombre no puede contener números. %(valor)s', code='Invalid', params={'valor': value})
 
+#no esta lista   
+def solo_numeros(value):
+    if any(char.isdigit() for char in value):
+        raise ValidationError('El DNI no puede contener letras. %(valor)s', code='Invalid', params={'valor': value}) 
+#corregir funcion solo_numeros
+
 def custom_validate_email(value):
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_regex, value):
@@ -63,9 +69,9 @@ class ContactoForm(forms.Form):
          label="DNI de contacto" , 
          max_length=8,
          required=True, 
+         validators=(solo_numeros,),
          widget=forms.TextInput(attrs={'class': 'form-control','type':'number','placeholder': 'Solo números'})
-    )
-    
+    )    
     mail = forms.EmailField(
         label='Email',
         max_length=100,
