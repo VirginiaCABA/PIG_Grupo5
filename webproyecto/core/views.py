@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from datetime import datetime
-from .forms import CreateCostumerForm
+from .forms import CreateCostumerForm, ContactoForm
+from django.contrib import messages
 
 # Create your views here.
 
@@ -20,7 +21,32 @@ def servicios(request):
 
 def contacto(request):
     '''Devuelve la section de contacto.'''
-    return render(request ,"core/pages/contacto.html")
+    if request.method == "POST":
+        formulario = ContactoForm(request.POST)
+        if formulario.is_valid():
+            messages.success(request,'Hemos recibido tus datos')
+            nombre = formulario.cleaned_data['nombre']
+            apellido = formulario.cleaned_data['apellido']
+            dni = formulario.cleaned_data['dni']
+            mail = formulario.cleaned_data['mail']
+            mensaje = formulario.cleaned_data['mensaje']
+
+            # Enviar correo electrónico (opcional)
+            """ send_mail(
+                'Mensaje de contacto de {}'.format(nombre),
+                mensaje,
+                email,
+                [settings.DEFAULT_FROM_EMAIL],
+                fail_silently=False,
+            ) """
+            return render(request ,'success.html')
+    else: #GET
+        formulario = ContactoForm()   
+    
+    context = {
+        'contacto_form' : formulario      
+    }
+    return render(request ,"core/pages/contacto.html" , context)
 
 @login_required
 def clientes(request):

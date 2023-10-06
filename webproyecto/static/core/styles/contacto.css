@@ -25,7 +25,7 @@
 
 
 .section .formulario {
-    margin-top: 3rem;
+    /* margin-top: 3rem; */
     grid-area: cuerpo;
     background-color: rgb(107,174,214);
     border-radius: 1rem;

@@ -259,7 +259,7 @@ body {
     flex-direction: row-reverse;
     align-items: center;
     margin: .5em auto;
-    background-color: rgba(107, 174, 214); */
+    background-color: rgba(107, 174, 214); 
     border-radius: .5rem;
     padding: 1em;
 }

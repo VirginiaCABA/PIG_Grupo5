@@ -1,4 +1,6 @@
+import re
 from django import forms
+from django.forms import ValidationError
 
 class CreateCostumerForm(forms.Form):
 	SERVICIOS_CHOICES = [
@@ -32,3 +34,49 @@ class CreateCostumerForm(forms.Form):
 
 	referencia = forms.CharField(label="Referencia", max_length="100", widget=forms.TextInput(attrs={"class": "form-control"}))
 	comentarios = forms.CharField(label="Comentarios", max_length="100", widget=forms.Textarea(attrs={"class": "form-control"}))
+
+def solo_caracteres(value):
+    if any(char.isdigit() for char in value):
+        raise ValidationError('El nombre no puede contener números. %(valor)s', code='Invalid', params={'valor': value})
+
+def custom_validate_email(value):
+    email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_regex, value):
+        raise ValidationError('Correo electrónico inválido')
+
+class ContactoForm(forms.Form):
+    nombre = forms.CharField(
+        label='Nombre de contacto',
+        max_length=50,
+        required=True, 
+        validators=(solo_caracteres,),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'})
+    )
+    apellido = forms.CharField(
+        label='Apellido de contacto',
+        max_length=50,
+        required=True, 
+        validators=(solo_caracteres,),
+        widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'Solo letras'})
+    )
+    dni = forms.CharField(
+         label="DNI de contacto" , 
+         max_length=8,
+         required=True, 
+         widget=forms.TextInput(attrs={'class': 'form-control','type':'number','placeholder': 'Solo números'})
+    )
+    
+    mail = forms.EmailField(
+        label='Email',
+        max_length=100,
+        required=True,
+        validators=(custom_validate_email,),
+        error_messages={'required': 'Por favor completa el campo'},
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'type': 'email','placeholder':'Introduzca email'})
+    )
+    mensaje = forms.CharField(
+        label='Mensaje',
+        max_length=500,
+        widget=forms.Textarea(attrs={'rows': 10, 'class': 'form-control'})
+    )
+    curriculun = forms.FileField(label="Curriculum" ,required=True)
