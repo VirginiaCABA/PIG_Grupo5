@@ -11,9 +11,11 @@
 </head>
 <body>
     <div class="container">
-        <form action="/crear_pedido/" method="post" id="myForm">
+        <form action="/crear_pedido/" method="POST" id="myForm">
             {% csrf_token %}
-            <div class="header">
+            {% form %}
+            <!--
+                <div class="header">
                 <h2>Crear envío</h2>
             </div>
             <div class="servicios">
@@ -53,6 +55,7 @@
                 </div>
             </div>
         <button type="submit">Enviar</button>
+            -->
     </form>
 </body>
 </html>

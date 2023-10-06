@@ -1,9 +1,10 @@
+from django.contrib import messages
+from django.http import HttpResponseBadRequest
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from datetime import datetime
-from .forms import CreateCostumerForm, ContactoForm
-from django.contrib import messages
+from .forms import PedidoForm, ContactoForm
 
 # Create your views here.
 
@@ -21,32 +22,41 @@ def servicios(request):
 
 def contacto(request):
     '''Devuelve la section de contacto.'''
-    if request.method == "POST":
+    formulario = None
+    error = None
+    if request.method == 'GET':
+        formulario = ContactoForm()
+    elif request.method == "POST":
         formulario = ContactoForm(request.POST)
         if formulario.is_valid():
-            messages.success(request,'Hemos recibido tus datos')
+            #Si los datos son válidos, los captura en variables
             nombre = formulario.cleaned_data['nombre']
             apellido = formulario.cleaned_data['apellido']
             dni = formulario.cleaned_data['dni']
             mail = formulario.cleaned_data['mail']
             mensaje = formulario.cleaned_data['mensaje']
-
-            # Enviar correo electrónico (opcional)
-            """ send_mail(
-                'Mensaje de contacto de {}'.format(nombre),
-                mensaje,
-                email,
-                [settings.DEFAULT_FROM_EMAIL],
+            #Se formatea la estructura del mail
+            asunto = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni})'
+            mensaje = f""""De : {nombre} <{mail}>\n Asunto: {asunto}\n Mensaje: {mensaje}"""
+            mensaje_html = f"""<p>De: {nombre} <a href="mailto:{mail}"> {mail}</a></p>
+                <p>Asunto: {asunto}</p><p>Mensaje: {mensaje}</p>"""
+            messages.success(request, 'Hemos recibido tus datos') # Mensaje de respuesta
+            #Y finalmente, se envía el mail
+            send_mail(
+                asunto,
+                mensaje_html,
+                "alejavieravila93@gmail.com",
+                ["alejavieravila93@gmail.com"],
                 fail_silently=False,
-            ) """
-            return render(request ,'success.html')
-    else: #GET
-        formulario = ContactoForm()   
-    
+            )
+        else:
+            error = HttpResponseBadRequest("Datos inválidos.")
+    else:
+        error = HttpResponseBadRequest("No tiene permiso para el método utilizado.")
     context = {
         'contacto_form' : formulario      
     }
-    return render(request ,"core/pages/contacto.html" , context)
+    return render(request ,"core/pages/contacto.html" , context) if error is None else error
 
 @login_required
 def clientes(request):
@@ -74,11 +84,10 @@ def exit(request):
 
 def crear_pedido(request):
     if (request.method == 'POST'):
-        form = CreateCostumerForm(request.POST)
+        form = PedidoForm(request.POST)
         if form.is_valid():
             servicios = form.cleaned_data['servicios']
-            
             # return render(request, 'success.html')
     else:
-        form = CreateCostumerForm()
+        form = PedidoForm()
     return render(request,"core/crear_pedido.html", {'form': form})
