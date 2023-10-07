@@ -1,0 +1,28 @@
+{% block title %} Codo a Codo - Logística - Contacto {% endblock %}
+
+{% load static %}
+
+{% include 'core/base.html' %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'core/styles/contacto.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <section class="section">
+        <article class="titulo">
+            
+            <h1>TRABAJA CON NOSOTROS</h1>
+            <h3>El trabajo en equipo hace que los sueños se cumplan.</h3>
+        </article>
+        <div class="formulario">
+            <form id="form" method="POST" action='{% url "contacto" %}' enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ contacto_form }}
+                <button id="btn" class="form-button" type="submit">Enviar</button>
+            </form>
+        </div>
+    </section>
+
+{% endblock %}

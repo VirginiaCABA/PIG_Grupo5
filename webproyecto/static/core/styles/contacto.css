@@ -1,87 +1,4 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    height: 100%;
-}
-
-body {
-    min-height: 100%;
-    font-family: 'Open Sans', sans-serif;
-    background-color: rgb(255, 255, 255);
-}
-
-.grid-container>* {
-    border-radius: 4px;
-    padding: 10px;
-    text-align: center;
-}
-
-.grid-container {
-    display: grid;
-    gap: 10px;
-    grid-template:
-        "header   header" 70px
-        "contenido aside" auto
-        "footer   footer" 60px /
-        70% auto;
-}
-
 /*--------------------------NAVBAR CABECERA--------------------------*/
-.contenedor {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 2rem;
-
-}
-
-.logo {
-
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.logo a {
-    text-decoration: none;
-    color: rgb(0, 0, 0);
-    display: flex;
-    align-items: center;
-}
-
-.contenedor ul {
-    display: flex;
-}
-
-.header_logo {
-    height: 2.5rem;
-    margin-right: 1em;
-}
-
-.header_links {
-    list-style-type: none;
-    align-items: center;
-}
-
-.header_list a {
-    text-decoration: none;
-    margin: 0 1em;
-    color: black;
-    font-size: 20px;
-}
-
-
-.header_list a:hover {
-    color: #b9b9b9;
-    transition: 0.3s;
-}
-
-.header_list .active {
-    color: white;
-}
 
 .header {
     grid-area: header;
@@ -105,22 +22,10 @@ body {
         "cuerpo" auto;
 }
 
-.section .titulo {
-    grid-area: titulo;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-}
-
-.section .titulo h3 {
-    font-weight: 300;
-    font-style: italic;
-}
 
 
 .section .formulario {
-    margin-top: 3rem;
+    /* margin-top: 3rem; */
     grid-area: cuerpo;
     background-color: rgb(107,174,214);
     border-radius: 1rem;
@@ -134,50 +39,13 @@ body {
     opacity:0;
 }
 /*--------------------------ASIDE----------------------------*/
-.aside {
-    grid-area: aside;
-    /* background-color: rgba(163, 149, 241, 0.774); */
-}
 
-.foto_aside {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-    margin-top: auto;
-}
+
 
 /*--------------------------FOOTER--------------------------*/
-.footer {
-    grid-area: footer;
-    /* background-color: rgba(65, 48, 48, 0.534); */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    background: rgb(8,81,156);
-}
 
-.footer_links {
-    display: flex;
-    list-style-type: none;
-}
 
-.footer_list img {
-    height: 25px;
-    width: auto;
-    padding: 0 10px;
 
-}
-@media screen and (max-width: 1052px) and (min-width:970px) {
-  .section{
-      margin-top: 2rem;
-  }
-  .aside{
-      margin-top: 2rem;
-  }
-}
 
 @media screen and (max-width: 970px) and (min-width:814px) {
     .grid-container {
@@ -356,9 +224,7 @@ h1{
     font-size: 30px;
 }
 
-.menu{
-    color: white;
-}
+
 
 .coment{
     padding-left: 30px;
@@ -572,3 +438,7 @@ h1{
   #errorFile::before{
     content: 'Por favor cargar el curriculum';
   }
+
+  .section {
+    grid-template: auto;
+}

@@ -5,12 +5,19 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}{% endblock %}</title>
+        
         {% load static %}
+
+        <!--------------BOOTSTRAP CDN-------------
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>    
+        -->
+        
         <!--------------FAVICON--------------->
         <link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/favicon_io/apple-touch-icon.png' %}">
         <link rel="icon" type="/img/png" sizes="32x32" href="{% static 'core/favicon_io/favicon-32x32.png' %}">
         <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/favicon_io/favicon-16x16.png' %}">
-        <!--------------FAVICON--------------->
         <link rel="stylesheet" href="{% static 'core/styles/style.css' %}">
         <link rel="preconnect" href="{% static 'core/ttps://fonts.googleapis.com' %}">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +37,6 @@
         <aside class="aside fixed-top">
             <img class="foto_aside" src="{% static 'core/img/foto_aside.jpg' %}" alt="foto mensajero">
         </aside>
-        <footer id="footer" class="footer">
-        </footer>
+        {% include 'core/footer.html' %}
     </body>
 </html>
