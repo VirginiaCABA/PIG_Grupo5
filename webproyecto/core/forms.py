@@ -2,15 +2,20 @@ from django import forms
 from django.forms import ValidationError
 from django.core.validators import validate_email
 
+def sin_espacios(value):
+    '''Remueve espacios al str que recibe "value"
+    para que funcionen isdigit y isalpha'''
+    return str(value).replace(' ','')
+
 def solo_caracteres(value):
     """Si el valor ingresado tiene números, falla"""
-    if str(value).isalpha():
+    if sin_espacios(value).isdigit():
         raise ValidationError('El valor no puede contener números. %(valor)s',
                               params={'valor': value})
 
 def solo_numeros(value):
     """Si el valor ingresado no cumple con el formato indicado, falla"""
-    if str(value).isdigit():
+    if sin_espacios(value).isalpha():
         raise ValidationError('El valor no puede contener letras. %(valor)s',
                               params={'valor': value})
 
@@ -34,22 +39,22 @@ class ContactoForm(forms.Form):
         label='Apellido de contacto',
         max_length=50,
         required=True,
-        #validators=[solo_caracteres],
+        validators=[solo_caracteres],
         widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'Solo letras'})
     )
     dni = forms.CharField(
          label="DNI de contacto",
          max_length=8,
-         #required=True,
-         #validators=[solo_numeros],
+         required=True,
+         validators=[solo_numeros],
          widget=forms.TextInput(attrs={'class': 'form-control','type':'number',
                                        'placeholder': 'Solo números'})
     )
     mail = forms.EmailField(
         label='Email',
         max_length=100,
-        #required=True,
-        #validators=[validar_mail],
+        required=True,
+        validators=[validar_mail],
         error_messages={'required': 'Por favor, completa el campo'},
         widget=forms.EmailInput(attrs={'class': 'form-control', 'type': 'email',
                                        'placeholder':'Introduzca email'})
@@ -59,7 +64,7 @@ class ContactoForm(forms.Form):
         max_length=500,
         widget=forms.Textarea(attrs={"rows":"5"})
     )
-    """curriculum = forms.FileField(label="Curriculum", required=True)"""
+    curriculum = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}))
 
 class PedidoForm(forms.Form):
     """Devuelve el formulario de pedidos"""

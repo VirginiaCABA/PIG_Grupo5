@@ -1,6 +1,6 @@
-from django.contrib import messages
-from django.http import HttpResponseBadRequest
-from django.core.mail import send_mail
+from django.conf import settings
+from django.http import HttpResponseBadRequest, HttpResponse
+from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -27,7 +27,7 @@ def contacto(request):
     if request.method == 'GET':
         formulario = ContactoForm()
     elif request.method == "POST":
-        formulario = ContactoForm(request.POST)
+        formulario = ContactoForm(request.POST, request.FILES)
         if formulario.is_valid():
             #Si los datos son válidos, los captura en variables
             nombre = formulario.cleaned_data['nombre']
@@ -35,20 +35,20 @@ def contacto(request):
             dni = formulario.cleaned_data['dni']
             mail = formulario.cleaned_data['mail']
             mensaje = formulario.cleaned_data['mensaje']
-            #Se formatea la estructura del mail
-            asunto = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni})'
-            mensaje = f""""De : {nombre} <{mail}>\n Asunto: {asunto}\n Mensaje: {mensaje}"""
-            mensaje_html = f"""<p>De: {nombre} <a href="mailto:{mail}"> {mail}</a></p>
-                <p>Asunto: {asunto}</p><p>Mensaje: {mensaje}</p>"""
-            messages.success(request, 'Hemos recibido tus datos') # Mensaje de respuesta
+            curriculum = request.FILES['curriculum']
             #Y finalmente, se envía el mail
-            send_mail(
-                asunto,
-                mensaje_html,
-                "alejavieravila93@gmail.com",
-                ["alejavieravila93@gmail.com"],
-                fail_silently=False,
+            email = EmailMessage(
+                f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni})',
+                mensaje,
+                settings.EMAIL_HOST_USER,
+                [mail],  # Lista de destinatarios
             )
+            email.attach(curriculum.name,
+                         curriculum.read(),
+                         curriculum.content_type)
+            email.send()
+            return HttpResponse('Correo enviado con éxito')
+        
         else:
             error = HttpResponseBadRequest("Datos inválidos.")
     else:

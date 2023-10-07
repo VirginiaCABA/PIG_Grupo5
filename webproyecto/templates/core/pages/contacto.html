@@ -17,7 +17,7 @@
             <h3>El trabajo en equipo hace que los sueños se cumplan.</h3>
         </article>
         <div class="formulario">
-            <form id="form" method="POST" action='{% url "contacto" %}'>
+            <form id="form" method="POST" action='{% url "contacto" %}' enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ contacto_form }}
                 <button id="btn" class="form-button" type="submit">Enviar</button>
