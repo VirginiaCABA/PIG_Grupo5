@@ -3,7 +3,6 @@ Repositorio del proyecto  codo a codo con Django
 Integrantes del grupo:
 1. Alejandro Ávila
 2. Rocio Román
-3. Ivan Mazurek
-4. Omar Ardila
-5. Diana Di Naro
-6. Virginia Vasquez
+3. Omar Ardila
+4. Diana Di Naro
+5. Virginia Vasquez
