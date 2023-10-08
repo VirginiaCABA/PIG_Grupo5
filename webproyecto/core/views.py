@@ -36,10 +36,14 @@ def contacto(request):
             mail = formulario.cleaned_data['mail']
             mensaje = formulario.cleaned_data['mensaje']
             curriculum = request.FILES['curriculum']
+
+            #formatear mensaje de respuesta
+            mensaje_html = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni}):\n {mensaje}'
+
             #Y finalmente, se envía el mail
             email = EmailMessage(
-                f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni})',
-                mensaje,
+                "Recibimos tus datos",
+                mensaje_html,
                 settings.EMAIL_HOST_USER,
                 [mail],  # Lista de destinatarios
             )
@@ -47,8 +51,8 @@ def contacto(request):
                          curriculum.read(),
                          curriculum.content_type)
             email.send()
-            return HttpResponse('Correo enviado con éxito')
-        
+            
+            return HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect
         else:
             error = HttpResponseBadRequest("Datos inválidos.")
     else:
