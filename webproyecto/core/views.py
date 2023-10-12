@@ -96,12 +96,19 @@ def crear_pedido(request):
         form = PedidoForm()
     return render(request,"core/crear_pedido.html", {'form': form})
 
-def Contacto(request):
+def contac_bas(request):
+    contacto = request.Contacto
     if request.method == 'POST':
         form = ContactoForm(request.POST)
         if form.is_valid():
-            form.save()
+            name = form.cleaned_data['Nombre de contacto']
+            lastname = form.cleaned_data['Apellido de contacto']
+            dni =  form.cleaned_data['DNI de contacto']
+            mail = form.cleaned_data['Email']
+            curriculum = request.File['archivo']
+            mensaje = form.cleaned_data['Mensaje']
+            
             return redirect('contacto')
     else:
         form = ContactoForm()
-    return render (request, 'contacto',{'form':form})
+    return render (request, 'contacto.html',{'form':form})
