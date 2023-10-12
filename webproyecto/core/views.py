@@ -37,25 +37,18 @@ def contacto(request):
             mail = formulario.cleaned_data['mail']
             mensaje = formulario.cleaned_data['mensaje']
             curriculum = request.FILES['curriculum']
+            # if Contacto.objects.filter(
+            #     dni=dni
+            # ).exists:
+            #     return HttpResponseBadRequest("El DNI ya esta registrado.")
+            if Contacto.objects.filter(
+                mail=mail
+            ).exists: 
+                return HttpResponseBadRequest("El Email {mail} ya esta registrado.".format(mail=mail))
 
             #formatear mensaje de respuesta
             mensaje_html = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni}):\n {mensaje}'
-            #objeto contacto
-            def crear_contacto(request):
-                id = request.id
-                if request.method == 'POST':
-                    form = ContactoForm(request.POST, request.FILES)
-                    if form.is_valid():
-                        Contacto = form.save(commit=False)  
-                        Contacto.id = request.id
-                        Contacto.save()
-                        return redirect('formulario_contacto.html')  # Reemplaza 'pagina_de_exito' con tu URL
-                else:
-                    form = ContactoForm()
         
-                return render(request, 'formulario_contacto.html', {'form': form})
-
-
             #Y finalmente, se envía el mail
             email = EmailMessage(
                 "Recibimos tus datos",
@@ -67,7 +60,16 @@ def contacto(request):
                          curriculum.read(),
                          curriculum.content_type)
             email.send()
-            
+            contacto=Contacto(
+                name=nombre,
+                lastname=apellido,
+                dni=dni,
+                mail=mail,
+                mensaje=mensaje,
+                curriculum=curriculum
+
+            )
+            contacto.save()
             return HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect
         else:
             error = HttpResponseBadRequest("Datos inválidos.")
