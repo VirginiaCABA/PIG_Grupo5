@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .forms import PedidoForm, ContactoForm
-from .models import Contacto
+
 # Create your views here.
 
 def home(request):
@@ -97,18 +97,16 @@ def crear_pedido(request):
     return render(request,"core/crear_pedido.html", {'form': form})
 
 def contac_bas(request):
-    contacto = request.Contacto
-    if request.method == 'POST':
-        form = ContactoForm(request.POST)
+        if request.method == 'POST':
+            form = ContactoForm(request.POST, request.FILES)
         if form.is_valid():
-            name = form.cleaned_data['Nombre de contacto']
-            lastname = form.cleaned_data['Apellido de contacto']
-            dni =  form.cleaned_data['DNI de contacto']
-            mail = form.cleaned_data['Email']
-            curriculum = request.File['archivo']
-            mensaje = form.cleaned_data['Mensaje']
+            name = form.cleaned_data['nombre']
+            lastname = form.cleaned_data['apellido']
+            dni =  form.cleaned_data['dni']
+            mail = form.cleaned_data['mail']
+            mensaje = form.cleaned_data['mensaje']
             
             return redirect('contacto')
-    else:
-        form = ContactoForm()
-    return render (request, 'contacto.html',{'form':form})
+        else:
+            form = ContactoForm()
+        return render (request, 'contacto.html',{'form':form})
