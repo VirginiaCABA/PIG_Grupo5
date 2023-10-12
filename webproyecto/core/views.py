@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .forms import PedidoForm, ContactoForm
+from .models import Contacto
 
 # Create your views here.
 
@@ -39,6 +40,21 @@ def contacto(request):
 
             #formatear mensaje de respuesta
             mensaje_html = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni}):\n {mensaje}'
+            #objeto contacto
+            def crear_contacto(request):
+                id = request.id
+                if request.method == 'POST':
+                    form = ContactoForm(request.POST, request.FILES)
+                    if form.is_valid():
+                        Contacto = form.save(commit=False)  
+                        Contacto.id = request.id
+                        Contacto.save()
+                        return redirect('formulario_contacto.html')  # Reemplaza 'pagina_de_exito' con tu URL
+                else:
+                    form = ContactoForm()
+        
+                return render(request, 'formulario_contacto.html', {'form': form})
+
 
             #Y finalmente, se envía el mail
             email = EmailMessage(
@@ -96,17 +112,3 @@ def crear_pedido(request):
         form = PedidoForm()
     return render(request,"core/crear_pedido.html", {'form': form})
 
-def contac_bas(request):
-        if request.method == 'POST':
-            form = ContactoForm(request.POST, request.FILES)
-        if form.is_valid():
-            name = form.cleaned_data['nombre']
-            lastname = form.cleaned_data['apellido']
-            dni =  form.cleaned_data['dni']
-            mail = form.cleaned_data['mail']
-            mensaje = form.cleaned_data['mensaje']
-            
-            return redirect('contacto')
-        else:
-            form = ContactoForm()
-        return render (request, 'contacto.html',{'form':form})
