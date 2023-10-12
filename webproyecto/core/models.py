@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 
 # Create your models here.
 #create table
-class User(models.Model):
+class Contacto(models.Model):
     id = models.AutoField(primary_key=True),
     name = models.CharField(max_length=10, blank=True, null=True)
     lastname = models.CharField(max_length=100, blank=True, null=True) 

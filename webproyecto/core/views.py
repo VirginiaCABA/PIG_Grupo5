@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .forms import PedidoForm, ContactoForm
-
+from .models import Contacto
 # Create your views here.
 
 def home(request):
@@ -95,3 +95,13 @@ def crear_pedido(request):
     else:
         form = PedidoForm()
     return render(request,"core/crear_pedido.html", {'form': form})
+
+def Contacto(request):
+    if request.method == 'POST':
+        form = ContactoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('contacto')
+    else:
+        form = ContactoForm()
+    return render (request, 'contacto',{'form':form})
