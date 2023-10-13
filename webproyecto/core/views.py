@@ -24,7 +24,7 @@ def servicios(request):
 def contacto(request):
     '''Devuelve la section de contacto.'''
     formulario = None
-    error = None
+    respuesta = None
     if request.method == 'GET':
         formulario = ContactoForm()
     elif request.method == "POST":
@@ -37,48 +37,36 @@ def contacto(request):
             mail = formulario.cleaned_data['mail']
             mensaje = formulario.cleaned_data['mensaje']
             curriculum = request.FILES['curriculum']
-            # if Contacto.objects.filter(
-            #     dni=dni
-            # ).exists:
-            #     return HttpResponseBadRequest("El DNI ya esta registrado.")
-            if Contacto.objects.filter(
-                mail=mail
-            ).exists: 
-                return HttpResponseBadRequest("El Email {mail} ya esta registrado.".format(mail=mail))
-
-            #formatear mensaje de respuesta
-            mensaje_html = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni}):\n {mensaje}'
-        
-            #Y finalmente, se envía el mail
-            email = EmailMessage(
-                "Recibimos tus datos",
-                mensaje_html,
-                settings.EMAIL_HOST_USER,
-                [mail],  # Lista de destinatarios
-            )
-            email.attach(curriculum.name,
-                         curriculum.read(),
-                         curriculum.content_type)
-            email.send()
-            contacto=Contacto(
-                name=nombre,
-                lastname=apellido,
-                dni=dni,
-                mail=mail,
-                mensaje=mensaje,
-                curriculum=curriculum
-
-            )
-            contacto.save()
-            return HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect
+            #verificar que no existe el mail en la BD
+            if Contacto.objects.filter(mail=mail).exists():
+                respuesta = HttpResponseBadRequest("El Email {mail} ya esta registrado.".format(mail=mail))
+            else:
+                #guardar los datos en la BD
+                nuevo_contacto = Contacto(nombre=nombre, apellido=apellido, dni=dni,
+                                        mail=mail, mensaje=mensaje, curriculum=curriculum)
+                nuevo_contacto.save()
+                #formatear mensaje de respuesta
+                mensaje_html = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni}):\n {mensaje}'
+                #Y finalmente, se envía el mail
+                email = EmailMessage(
+                    "Recibimos tus datos",
+                    mensaje_html,
+                    settings.EMAIL_HOST_USER,
+                    [mail],  # Lista de destinatarios
+                )
+                email.attach(curriculum.name,
+                            curriculum.read(),
+                            curriculum.content_type)
+                email.send()
+                respuesta = HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect
         else:
-            error = HttpResponseBadRequest("Datos inválidos.")
+            respuesta = HttpResponseBadRequest("Datos inválidos.")
     else:
-        error = HttpResponseBadRequest("No tiene permiso para el método utilizado.")
+        respuesta = HttpResponseBadRequest("No tiene permiso para el método utilizado.")
     context = {
         'contacto_form' : formulario      
     }
-    return render(request ,"core/pages/contacto.html" , context) if error is None else error
+    return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
 
 @login_required
 def clientes(request):
