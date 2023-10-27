@@ -33,21 +33,24 @@ class ContactoForm(forms.Form):
         max_length=50,
         required=True,
         validators=[solo_caracteres],
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'})
+        widget=forms.TextInput(attrs={'class': 'form-control',
+                                      'placeholder': 'Solo letras'})
     )
     apellido = forms.CharField(
         label='Apellido de contacto',
         max_length=50,
         required=True,
         validators=[solo_caracteres],
-        widget=forms.TextInput(attrs={'class': 'form-control','placeholder': 'Solo letras'})
+        widget=forms.TextInput(attrs={'class': 'form-control',
+                                      'placeholder': 'Solo letras'})
     )
     dni = forms.CharField(
          label="DNI de contacto",
          max_length=8,
          required=True,
          validators=[solo_numeros],
-         widget=forms.TextInput(attrs={'class': 'form-control','type':'number',
+         widget=forms.TextInput(attrs={'class': 'form-control',
+                                       'type':'number',
                                        'placeholder': 'Solo números'})
     )
     mail = forms.EmailField(
@@ -56,15 +59,17 @@ class ContactoForm(forms.Form):
         required=True,
         validators=[validar_mail],
         error_messages={'required': 'Por favor, completa el campo'},
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'type': 'email',
-                                       'placeholder':'Introduzca email'})
+        widget=forms.EmailInput(attrs={'class': 'form-control',
+                                       'type': 'email',
+                                       'placeholder':'Introduzca dirección de email'})
     )
+    curriculum = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}))
     mensaje = forms.CharField(
         label='Mensaje',
         max_length=500,
-        widget=forms.Textarea(attrs={"rows":"5"})
+        widget=forms.Textarea(attrs={'rows': '7',
+                                     'class': 'form-control'})
     )
-    curriculum = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}))
 
 class PedidoForm(forms.Form):
     """Devuelve el formulario de pedidos"""

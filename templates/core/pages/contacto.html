@@ -1,0 +1,42 @@
+{% block title %} Codo a Codo - Logística - Contacto {% endblock %}
+
+{% load static %}
+
+{% include 'core/base.html' %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'core/styles/contacto.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <section class="section">
+        <article class="titulo">
+            <h1>TRABAJA CON NOSOTROS</h1>
+            <h3>El trabajo en equipo hace que los sueños se cumplan.</h3>
+        </article>
+        <div class="formulario p-1">
+            <form id="form" method="POST" action='{% url "contacto" %}' enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-column">
+                    <label for="{{ contacto_form.nombre.id_for_label }}">{{ contacto_form.nombre.name }}</label>
+                    {{ contacto_form.nombre }}
+                    <label for="{{ contacto_form.apellido.id_for_label }}">{{ contacto_form.apellido.name }}</label>
+                    {{ contacto_form.apellido }}
+                    <label for="{{ contacto_form.dni.id_for_label }}">{{ contacto_form.dni.name }}</label>
+                    {{ contacto_form.dni }}
+                    <label for="{{ contacto_form.mail.id_for_label }}">{{ contacto_form.mail.name }}</label>
+                    {{ contacto_form.mail }}
+                </div>
+                <div class="form-column">
+                    <label for="{{ contacto_form.curriculum.id_for_label }}">{{ contacto_form.curriculum.name }}</label>
+                    {{ contacto_form.curriculum }}
+                    <label for="{{ contacto_form.mensaje.id_for_label }}">{{ contacto_form.mensaje.name }}</label>
+                    {{ contacto_form.mensaje }}
+                </div>
+                <button id="btn" class="form-button" type="submit">Enviar</button>
+            </form>
+        </div>
+    </section>
+
+{% endblock %}
