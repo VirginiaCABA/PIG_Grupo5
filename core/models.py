@@ -60,7 +60,7 @@ class Persona(models.Model):
 class PostulanteManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(_baja=False)
+        return super().get_queryset().filter(baja=False)
     
 class Postulante(Persona):
     idpostulante = models.AutoField(primary_key=True),
