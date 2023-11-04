@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .forms import PedidoForm, ContactoForm
-from .models import Contacto
+from .models import Postulante
 
 # Create your views here.
 
@@ -38,11 +38,11 @@ def contacto(request):
             mensaje = formulario.cleaned_data['mensaje']
             curriculum = request.FILES['curriculum']
             #verificar que no existe el mail en la BD
-            if Contacto.objects.filter(mail=mail).exists():
-                respuesta = HttpResponseBadRequest("El Email {mail} ya esta registrado.".format(mail=mail))
+            if Postulante.objects.filter(mail=mail).exists():
+                respuesta = HttpResponseBadRequest(f"El Email {mail} ya esta registrado.")
             else:
                 #guardar los datos en la BD
-                nuevo_contacto = Contacto(nombre=nombre, apellido=apellido, dni=dni,
+                nuevo_contacto = Postulante(nombre=nombre, apellido=apellido, dni=dni,
                                         mail=mail, mensaje=mensaje, curriculum=curriculum)
                 nuevo_contacto.save()
                 #formatear mensaje de respuesta
@@ -71,7 +71,14 @@ def contacto(request):
 @login_required
 def clientes(request):
     '''Recibe los datos del usuario y devuelve la vista de clientes.'''
-    return render(request ,"core/pages/clientes.html")
+    if (request.method == 'POST'):
+        form = PedidoForm(request.POST)
+        if form.is_valid():
+            servicios = form.cleaned_data['servicios']
+            # return render(request, 'success.html')
+    else:
+        form = PedidoForm()
+    return render(request ,"core/pages/clientes.html", {'form': form})
 
 @login_required
 def empleados(request, fecha):
@@ -91,14 +98,3 @@ def exit(request):
     '''Cierre la sesión y envía al home'''
     logout(request)
     return redirect('home')
-
-def crear_pedido(request):
-    if (request.method == 'POST'):
-        form = PedidoForm(request.POST)
-        if form.is_valid():
-            servicios = form.cleaned_data['servicios']
-            # return render(request, 'success.html')
-    else:
-        form = PedidoForm()
-    return render(request,"core/crear_pedido.html", {'form': form})
-

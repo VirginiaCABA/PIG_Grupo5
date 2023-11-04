@@ -23,7 +23,7 @@ form{
     display: flex; 
     margin: 1rem auto; 
     flex-direction: column; 
-    width: 60vw;
+    /*width: 60vw;*/
 }
 .header, .interactivo{
     display: flex;
@@ -69,3 +69,34 @@ ul{
     padding-left: 0.5rem;
     list-style: none;
 }
+
+
+.section .formulario {
+    margin-top: 5%;
+    grid-area: cuerpo;
+    background-color: rgb(107,174,214);
+    border-radius: 1rem;
+    box-shadow: 0px 0px 15px 6px rgba(0, 0, 0, 0.5);
+    height: 60%;
+}
+
+/* estilo para acomodar formulario en dos columnas */
+
+.form-column {
+    width: 100%;
+    box-sizing: border-box;
+    float: left;
+    padding: 10px;
+  }
+  
+  .form-button {
+    width: 10%;
+    box-sizing: border-box;
+    margin-top: 10px;
+  }
+  
+  @media (min-width: 768px) {
+    .form-column {
+        width: 48%;
+    }
+  }

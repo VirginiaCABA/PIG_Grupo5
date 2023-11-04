@@ -74,45 +74,56 @@ class ContactoForm(forms.Form):
 class PedidoForm(forms.Form):
     """Devuelve el formulario de pedidos"""
     SERVICIOS_CHOICES = [
-        ("0", "Servicios"),
+        ("", "Seleccionar..."),
+        ("1", "Servicios en gral."),
         ("1", "Courier - Mensajería - Cadetes fijos"),
         ("2", "Transportes y cargas"),
         ("3", "E-Commerce y distribución de paquetería")
-        ]
-    servicios = forms.ChoiceField(label="Elige el servicio a contratar", required=True,
-                                  widget=forms.Select, choices=SERVICIOS_CHOICES)
-    direccion = forms.CharField(label="Dirección recolección", max_length="100", required=True,
+    ]
+
+    servicios = forms.ChoiceField(label="Tipo de Servicio",
+                                  widget=forms.Select, choices=SERVICIOS_CHOICES, required=True)
+
+    direccion = forms.CharField(label="* Dirección", max_length="100", required=True,
                                 widget=forms.TextInput(attrs={"class": "form-control"}))
-    codigo_postal = forms.CharField(label="Código Postal", max_length="100", required=True,
+
+    codigo_postal = forms.CharField(label="* Código Postal", max_length="100", required=True,
                                     widget=forms.TextInput(attrs={"class": "form-control"}))
-    altura = forms.CharField(label="No. Exterior (altura)", max_length="100", required=True,
+
+    altura = forms.CharField(label="* Altura", max_length="100", required=True,
                              widget=forms.TextInput(attrs={"class": "form-control"}))
-    piso_dpto = forms.CharField(label="No. Interior (opcional)", max_length="100",
+
+    piso_dpto = forms.CharField(label="Piso/Dpto (opcional)", max_length="100",
                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+
     instrucciones = forms.CharField(label="Instrucciones (opcional)", max_length="100",
                                     widget=forms.TextInput(attrs={"class": "form-control"}))
 
-    nombre = forms.CharField(label="Nombre *", max_length="100", required=True,
+    nombre = forms.CharField(label="* Nombre", max_length="100", required=True,
                              widget=forms.TextInput(attrs={"class": "form-control"}))
-    telefono = forms.DecimalField(label="Telefono *", max_digits="20", required=True,
+
+    telefono = forms.DecimalField(label="* Telefono", max_digits="20", required=True,
                                   widget=forms.NumberInput(attrs={"class": "form-control"}))
 
-    nombre_alternativo = forms.CharField(label="Nombre *", max_length="100", required=True,
+    nombre_alternativo = forms.CharField(label="* Nombre Alternativo", max_length="100", required=True,
                                          widget=forms.TextInput(attrs={"class": "form-control"}))
-    telefono_alternativo = forms.DecimalField(label="Telefono *", max_digits="20", required=True,
+
+    telefono_alternativo = forms.DecimalField(label="* Telefono Alternativo", max_digits="20", required=True,
                                               widget=forms.NumberInput(attrs={"class": "form-control"}))
 
     PAQUETE_CHOICES = [
-		("", "Elige el tipo de paquete"),
+		("", "Seleccionar..."),
 		("1", "Sobre - Mensajero con mochila (Documentos, libros, sobres, etc)"),
 		("2", "Caja pequeña - Máximo: Ancho:39.5 cm Alto:30.5cm, Peso: 1kg"),
 		("3", "Caja mediana - Máximo: 30 L x 40 An x 30 Al (Hasta 15KG)"),
 		("4", "Caja grande - Máximo: 40L x 50 An x 40 Al. (Hasta 25kg)")
 	]
-    paquete = forms.ChoiceField( label="Elige el tipo de paquete", 
-                                widget=forms.Select, choices=PAQUETE_CHOICES, required=True)
-    referencia = forms.CharField(label="Referencia", max_length="100", 
-                                 widget=forms.TextInput(attrs={"class": "form-control"}))
-    comentarios = forms.CharField(label="Comentarios", max_length="100", 
-                                  widget=forms.Textarea(attrs={"class": "form-control"}))
 
+    paquete = forms.ChoiceField( label="Tipo de paquete",
+                                widget=forms.Select, choices=PAQUETE_CHOICES, required=True)
+
+    referencia = forms.CharField(label="Referencia", max_length="100",
+                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    comentarios = forms.CharField(label="Comentarios", max_length="100",
+                                  widget=forms.Textarea(attrs={"class": "form-control"}))

@@ -4,20 +4,6 @@ from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
 
 # Create your models here.
-
-class Contacto(models.Model):
-    id = models.AutoField(primary_key=True),
-    nombre = models.CharField(max_length=100, blank=True, null=True)
-    apellido = models.CharField(max_length=100, blank=True, null=True) 
-    dni =  models.CharField(max_length=10,
-                            validators=[RegexValidator(r'^\d{8,10}$',
-                            message='El número de dni debe tener entre 8 y 10 dígitos.')])
-    mail = models.EmailField(max_length=100, unique=True)
-    curriculum = models.FileField(upload_to='cv_upload/')
-    mensaje = models.TextField(max_length=500, blank=True, null=True)
-
-#--------------------------------------------------------------------------------------------------------
-
 class Domicilio(models.Model):
     iddomicilio = models.AutoField(primary_key=True),
     calle = models.CharField(max_length=150, verbose_name='Calle')
@@ -58,25 +44,10 @@ class Persona(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     apellido = models.CharField(max_length=150, verbose_name='Apellido')
     mail = models.EmailField(max_length=150, null=True)
+    baja = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.apellido}, {self.nombre}"
-
-class EmpleadoManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset().filter(baja=False)
-
-class Empleado(Persona):
-    idempleado = models.AutoField(primary_key=True),
-    dni = models.IntegerField(verbose_name="DNI")
-    curriculum = models.FileField(upload_to='cv_upload/')
-    pedidos = models.ManyToManyField(Pedido) # relacion muchos a muchos
-    baja = models.BooleanField(default=False)
-    objects = EmpleadoManager()
-
-    def __str__(self):
-        return f"{self.dni} - " + super().__str__()
 
     def soft_delete(self):
         self.baja = True
@@ -85,6 +56,46 @@ class Empleado(Persona):
     def restore(self):
         self.baja = False
         super().save()
+    
+class PostulanteManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(_baja=False)
+    
+class Postulante(Persona):
+    idpostulante = models.AutoField(primary_key=True),
+    dni =  models.CharField(verbose_name="DNI",
+                            max_length=10,
+                            validators=[RegexValidator(r'^\d{8,10}$',
+                            message='El número de dni debe tener entre 8 y 10 dígitos.')])
+    curriculum = models.FileField(upload_to='cv_upload/')
+    mensaje = models.TextField(max_length=500, blank=True, null=True)
+    objects = PostulanteManager()
+
+    def __str__(self):
+        return f"{self.dni} - " + super().__str__()
+
+    def obtener_baja_url(self):
+        return reverse_lazy('postulante_baja', args=[self.idpostulante])
+
+    def obtener_modificacion_url(self):
+        return reverse_lazy('postulante_modificacion', args=[self.idpostulante])
+
+    class Meta():
+        verbose_name_plural = 'Postulantes'
+
+class EmpleadoManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(baja=False)
+
+class Empleado(Postulante):
+    idempleado = models.AutoField(primary_key=True),
+    pedidos = models.ManyToManyField(Pedido) # relacion muchos a muchos
+    objects = EmpleadoManager()
+
+    def __str__(self):
+        return f"{self.dni} - " + super().__str__()
 
     def obtener_baja_url(self):
         return reverse_lazy('empleado_baja', args=[self.idempleado])
@@ -104,19 +115,10 @@ class Cliente(Persona):
     idcliente = models.AutoField(primary_key=True),
     cuit = models.IntegerField(verbose_name="CUIT")
     domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
-    baja = models.BooleanField(default=False)
     objects = ClienteManager()
 
     def __str__(self):
         return f"{self.cuit} - " + super().__str__()
-
-    def soft_delete(self):
-        self.baja = True
-        super().save()
-
-    def restore(self):
-        self.baja = False
-        super().save()
 
     def obtener_baja_url(self):
         return reverse_lazy('cliente_baja', args=[self.idcliente])
