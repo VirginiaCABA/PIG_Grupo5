@@ -14,7 +14,7 @@ class Domicilio(models.Model):
     latitud = models.FloatField(verbose_name="Latitud")
     longitud = models.FloatField(verbose_name="Longitud")
 
-class EstadoPaquete(models.TextChoices):
+class EstadoPedido(models.TextChoices): #Estado de Pedido
     RECIBIDO = '1', 'Recibido'
     PROCESADO = '2', 'Procesado'
     ASIGNADO = '3', 'Asignado'
@@ -24,7 +24,7 @@ class EstadoPaquete(models.TextChoices):
 
 class Pedido(models.Model):
     idpedido = models.AutoField(primary_key=True),
-    estado = models.CharField(max_length=3, choices=EstadoPaquete.choices, default=EstadoPaquete.RECIBIDO)
+    estado = models.CharField(max_length=3, choices=EstadoPedido.choices, default=EstadoPedido.RECIBIDO)
     domicilio_destino = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
 
 class Paquete(models.Model):
@@ -40,6 +40,7 @@ class Sucursal(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     numero = models.IntegerField(verbose_name="Número")
     domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+
 class Persona(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     apellido = models.CharField(max_length=150, verbose_name='Apellido')
@@ -69,6 +70,7 @@ class Postulante(Persona):
                             validators=[RegexValidator(r'^\d{8,10}$',
                             message='El número de dni debe tener entre 8 y 10 dígitos.')])
     curriculum = models.FileField(upload_to='cv_upload/')
+    descripcion = models.TextField(max_length=500, blank=True, null=True)
     mensaje = models.TextField(max_length=500, blank=True, null=True)
     objects = PostulanteManager()
 
