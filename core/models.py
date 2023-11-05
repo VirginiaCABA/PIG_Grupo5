@@ -13,6 +13,7 @@ class Domicilio(models.Model):
     departamento = models.CharField(max_length=150, verbose_name='Dpto')
     latitud = models.FloatField(verbose_name="Latitud")
     longitud = models.FloatField(verbose_name="Longitud")
+    objects = models.Manager()
 
 class EstadoPedido(models.TextChoices): #Estado de Pedido
     RECIBIDO = '1', 'Recibido'
@@ -34,6 +35,7 @@ class Paquete(models.Model):
     ancho = models.FloatField(verbose_name="Ancho")
     largo = models.FloatField(verbose_name="Largo")
     alto = models.FloatField(verbose_name="Alto")
+    objects = models.Manager()
 
 class Sucursal(models.Model):
     idsucursal =  models.AutoField(primary_key=True),
@@ -92,7 +94,7 @@ class EmpleadoManager(models.Manager):
 
 class Empleado(Postulante):
     idempleado = models.AutoField(primary_key=True),
-    pedidos = models.ManyToManyField(Pedido) # relacion muchos a muchos
+    pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
     objects = EmpleadoManager()
 
     def __str__(self):
@@ -106,6 +108,11 @@ class Empleado(Postulante):
 
     class Meta():
         verbose_name_plural = 'Empleados'
+
+class AsignacionPedido(models.Model):
+    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    fecha = models.DateField()
 
 class ClienteManager(models.Manager):
 

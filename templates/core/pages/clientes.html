@@ -2,30 +2,48 @@
 
 {% block title %} Codo a Codo - Logística - Clientes {% endblock %}
 
-{% load static %}
+{% if request.user.is_authenticated %}
 
-{% block links %}
-    <link rel="stylesheet" href="{% static 'core/styles/clientes.css' %}">
-    <script src="{% static 'core/js/clientes.js' %}"></script>
+    {% load static %}
 
-{% endblock %}
+    {% block links %}
+        <link rel="stylesheet" href="{% static 'core/styles/clientes.css' %}">
+        <script src="{% static 'core/js/clientes.js' %}"></script>
 
-{% block content %}
+    {% endblock %}
 
-    <h3>Panel de Clientes</h3><br>
+    {% block content %}
 
-    <section class="section">
-        <div class="formulario p-1">
-            <form action='{% url "clientes" %}' method="POST" id="form">
-                {% csrf_token %}
-                <h2>Domicilio de destino</h2>
-                {{ domicilio_form.as_p }}
-                {{ pedido_form.as_p }}
-                <h2>Datos del paquete</h2>
-                {{ paquete_form.as_p }}
-                <button type="submit">Enviar</button>
-            </form>
-        </div>
-    </section>
-    
-{% endblock %}
+        <h3>Panel de Clientes</h3><br>
+
+        <section class="section">
+            <div class="formulario p-1">
+                <form action='{% url "clientes" %}' method="POST" id="form">
+                    {% csrf_token %}
+                    
+                    {{ pedido_form.as_p }}
+                    {{ domicilio_formset.management_form }}
+                    {{ paquete_formset.management_form }}
+
+                    <h2>Domicilio de destino</h2>
+                    {% for form in domicilio_formset %}
+                        {{ form.as_p }}
+                    {% endfor %}
+
+                    <h2>Paquetes</h2>
+                    {% for form in paquete_formset %}
+                        {{ form.as_p }}
+                    {% endfor %}
+                    
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
+        </section>
+
+    {% endblock %}
+
+{% else %}
+
+    <p>No tiene permiso para acceder a esta pagina.</p>
+
+{% endif %}

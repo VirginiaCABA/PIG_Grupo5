@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ValidationError, ModelForm, inlineformset_factory
+from django.forms import ValidationError, ModelForm, modelformset_factory
 from django.core.validators import validate_email
 from .models import Domicilio, Pedido, Paquete
 
@@ -72,26 +72,28 @@ class ContactoForm(forms.Form):
                                      'class': 'form-control'})
     )
 
-class DomicilioForm(ModelForm):
-    """Crea el formulario del domicilio al que se envía un pedido"""
+DomicilioFormSet = modelformset_factory(Domicilio, fields='__all__', extra=1)
+""" class DomicilioForm(ModelForm):
     class Meta:
         model = Domicilio
-        fields = '__all__'
+        fields = '__all__' """
 
-class PaqueteForm(ModelForm):
-    """Crea el formulario para cada paquete de un pedido"""
+PaqueteFormSet = modelformset_factory(Paquete, fields='__all__', widgets={'pedido': forms.HiddenInput()}, extra=1)
+""" class PaqueteForm(ModelForm):
     class Meta:
         model = Paquete
         fields = '__all__'
         widgets = {
             'pedido': forms.HiddenInput(),
-        }
+        } """
 
 class PedidoForm(ModelForm):
     """Crea el formulario de pedidos"""
     class Meta:
         model = Pedido
-        fields = ["domicilio_destino"]
+        fields = '__all__'
+        domicilio_destino = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
+        paquetes = PaqueteFormSet(queryset=Paquete.objects.none(), prefix='paquetes')
         widgets = {
             'domicilio_destino': forms.HiddenInput(),
         }

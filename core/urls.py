@@ -22,7 +22,6 @@ urlpatterns = [
     path('nosotros/', nosotros, name='nosotros'),
     path('servicios/', servicios, name='servicios'),
     path('contacto/', contacto, name='contacto'),
-    path('contacto/submit', mensaje_envio, name='mensaje_envio'),
     path('clientes/', clientes, name='clientes'),
     re_path(r'^empleados/(?P<fecha>\d{4}-\d{2}-\d{2})/$',  empleados, name='empleados'),
     path('logout/', exit, name='exit'),

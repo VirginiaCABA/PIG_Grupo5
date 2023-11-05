@@ -4,8 +4,8 @@ from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Postulante
-from .forms import ContactoForm, DomicilioForm, PedidoForm, PaqueteForm
+from .models import Postulante, Paquete, Domicilio
+from .forms import ContactoForm, PedidoForm, PaqueteFormSet, DomicilioFormSet
 
 # Create your views here.
 
@@ -68,38 +68,44 @@ def contacto(request):
     }
     return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
 
-def mensaje_envio(request):
-    return render(request, "core/pages/mensaje_envio.html")
-
 
 @login_required
 def clientes(request):
     '''Recibe los datos del usuario y devuelve la vista de clientes.'''
     if (request.method == 'POST'):
         
-        domicilio_form = DomicilioForm(request.POST)
         pedido_form = PedidoForm(request.POST)
-        paquete_form = PaqueteForm(request.POST)
+        domicilio_formset = DomicilioFormSet(request.POST, prefix='domicilios', queryset=Domicilio.objects.none())
+        paquete_formset = PaqueteFormSet(request.POST, prefix='paquetes', queryset=Paquete.objects.none())
 
-        if domicilio_form.is_valid() and pedido_form.is_valid() and paquete_form.is_valid():
-            domicilio = domicilio_form.save()
-            pedido = pedido_form.save(commit=False)
-            pedido.domicilio_destino = domicilio
-            pedido.save()
-            paquete = paquete_form.save(commit=False)
-            paquete.pedido = pedido
-            paquete.save()
+        if pedido_form.is_valid():
+            pedido = pedido_form.save()
+            
+            """ if domicilio_formset.is_valid():
+                domicilio_formset.save(commit=False)
+                for form in domicilio_formset.forms:
+                    domicilio = form.save(commit=False)
+                    domicilio.pedido = pedido
+                    domicilio.save() """
+
+            if paquete_formset.is_valid():
+                paquete_formset.save(commit=False)
+                for form in paquete_formset.forms:
+                    paquete = form.save(commit=False)
+                    paquete.pedido = pedido
+                    paquete.save()
+
             return HttpResponse('Pedido cargado')
     else:
-        domicilio_form = DomicilioForm()
         pedido_form = PedidoForm()
-        paquete_form = PaqueteForm()
+        domicilio_formset = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
+        paquete_formset = PaqueteFormSet(queryset=Paquete.objects.none(), prefix='paquetes')
 
     return render(request ,"core/pages/clientes.html", {
-        'domicilio_form': domicilio_form,
         'pedido_form': pedido_form,
-        'paquete_form': paquete_form,
-    })
+        'domicilio_formset': domicilio_formset,
+        'paquete_formset': paquete_formset
+        })
 
 @login_required
 def empleados(request, fecha):
