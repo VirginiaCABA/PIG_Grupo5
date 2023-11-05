@@ -1,11 +1,11 @@
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseRedirect
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .forms import PedidoForm, ContactoForm
 from .models import Postulante
+from .forms import ContactoForm, DomicilioForm, PedidoForm, PaqueteForm
 
 # Create your views here.
 
@@ -42,9 +42,9 @@ def contacto(request):
                 respuesta = HttpResponseBadRequest(f"El Email {mail} ya esta registrado.")
             else:
                 #guardar los datos en la BD
-                nuevo_contacto = Postulante(nombre=nombre, apellido=apellido, dni=dni,
+                nuevo_postulante = Postulante(nombre=nombre, apellido=apellido, dni=dni,
                                         mail=mail, mensaje=mensaje, curriculum=curriculum)
-                nuevo_contacto.save()
+                nuevo_postulante.save()
                 #formatear mensaje de respuesta
                 mensaje_html = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni}):\n {mensaje}'
                 #Y finalmente, se envía el mail
@@ -58,7 +58,7 @@ def contacto(request):
                             curriculum.read(),
                             curriculum.content_type)
                 email.send()
-                respuesta = HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect
+                respuesta = HttpResponseRedirect("core/pages/mensaje_envio.html")
         else:
             respuesta = HttpResponseBadRequest("Datos inválidos.")
     else:
@@ -72,13 +72,30 @@ def contacto(request):
 def clientes(request):
     '''Recibe los datos del usuario y devuelve la vista de clientes.'''
     if (request.method == 'POST'):
-        form = PedidoForm(request.POST)
-        if form.is_valid():
-            servicios = form.cleaned_data['servicios']
-            # return render(request, 'success.html')
+        
+        domicilio_form = DomicilioForm(request.POST)
+        pedido_form = PedidoForm(request.POST)
+        paquete_form = PaqueteForm(request.POST)
+
+        if domicilio_form.is_valid() and pedido_form.is_valid() and paquete_form.is_valid():
+            domicilio = domicilio_form.save()
+            pedido = pedido_form.save(commit=False)
+            pedido.domicilio_destino = domicilio
+            pedido.save()
+            paquete = paquete_form.save(commit=False)
+            paquete.pedido = pedido
+            paquete.save()
+            return HttpResponse('Pedido cargado')
     else:
-        form = PedidoForm()
-    return render(request ,"core/pages/clientes.html", {'form': form})
+        domicilio_form = DomicilioForm()
+        pedido_form = PedidoForm()
+        paquete_form = PaqueteForm()
+
+    return render(request ,"core/pages/clientes.html", {
+        'domicilio_form': domicilio_form,
+        'pedido_form': pedido_form,
+        'paquete_form': paquete_form,
+    })
 
 @login_required
 def empleados(request, fecha):

@@ -10,7 +10,7 @@ class Domicilio(models.Model):
     numero = models.IntegerField(verbose_name="Número")
     cp = models.IntegerField(verbose_name="Código Postal")
     piso = models.IntegerField(verbose_name="Piso")
-    departamento = models.CharField(max_length=150, verbose_name='Calle')
+    departamento = models.CharField(max_length=150, verbose_name='Dpto')
     latitud = models.FloatField(verbose_name="Latitud")
     longitud = models.FloatField(verbose_name="Longitud")
 
@@ -70,7 +70,6 @@ class Postulante(Persona):
                             validators=[RegexValidator(r'^\d{8,10}$',
                             message='El número de dni debe tener entre 8 y 10 dígitos.')])
     curriculum = models.FileField(upload_to='cv_upload/')
-    descripcion = models.TextField(max_length=500, blank=True, null=True)
     mensaje = models.TextField(max_length=500, blank=True, null=True)
     objects = PostulanteManager()
 

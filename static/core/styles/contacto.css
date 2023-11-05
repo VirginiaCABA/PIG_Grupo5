@@ -462,3 +462,7 @@ h1{
   .section {
     grid-template: auto;
 }
+
+label{
+  text-transform: capitalize;
+}
