@@ -29,7 +29,7 @@ def validar_mail(value):
 class ContactoForm(forms.Form):
     """Devuelve el formulario de contactos"""
     nombre = forms.CharField(
-        label='Nombre de contacto',
+        label='Nombre',
         max_length=50,
         required=True,
         validators=[solo_caracteres],
@@ -37,7 +37,7 @@ class ContactoForm(forms.Form):
                                       'placeholder': 'Solo letras'})
     )
     apellido = forms.CharField(
-        label='Apellido de contacto',
+        label='Apellido',
         max_length=50,
         required=True,
         validators=[solo_caracteres],
@@ -45,7 +45,7 @@ class ContactoForm(forms.Form):
                                       'placeholder': 'Solo letras'})
     )
     dni = forms.CharField(
-         label="DNI de contacto",
+         label="DNI",
          max_length=8,
          required=True,
          validators=[solo_numeros],

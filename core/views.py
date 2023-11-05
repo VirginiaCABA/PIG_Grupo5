@@ -4,6 +4,7 @@ from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.urls import reverse_lazy
 from .forms import PedidoForm, ContactoForm
 from .models import Postulante
 
@@ -53,20 +54,25 @@ def contacto(request):
                     mensaje_html,
                     settings.EMAIL_HOST_USER,
                     [mail],  # Lista de destinatarios
-                )
+                ) 
                 email.attach(curriculum.name,
                             curriculum.read(),
                             curriculum.content_type)
                 email.send()
-                respuesta = HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect
+                respuesta = HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect 
+                return redirect ('mensaje_envio')
         else:
-            respuesta = HttpResponseBadRequest("Datos inválidos.")
+            respuesta = HttpResponseBadRequest("Datos inválidos.") 
     else:
         respuesta = HttpResponseBadRequest("No tiene permiso para el método utilizado.")
     context = {
         'contacto_form' : formulario      
     }
     return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
+
+def mensaje_envio(request):
+    return render(request, "core/pages/mensaje_envio.html")
+
 
 @login_required
 def clientes(request):

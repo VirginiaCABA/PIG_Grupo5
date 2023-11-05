@@ -70,7 +70,6 @@ class Postulante(Persona):
                             validators=[RegexValidator(r'^\d{8,10}$',
                             message='El número de dni debe tener entre 8 y 10 dígitos.')])
     curriculum = models.FileField(upload_to='cv_upload/')
-    descripcion = models.TextField(max_length=500, blank=True, null=True)
     mensaje = models.TextField(max_length=500, blank=True, null=True)
     objects = PostulanteManager()
 
