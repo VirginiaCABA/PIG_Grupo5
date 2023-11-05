@@ -53,20 +53,24 @@ def contacto(request):
                     mensaje_html,
                     settings.EMAIL_HOST_USER,
                     [mail],  # Lista de destinatarios
-                )
+                ) 
                 email.attach(curriculum.name,
                             curriculum.read(),
                             curriculum.content_type)
                 email.send()
                 respuesta = HttpResponseRedirect("core/pages/mensaje_envio.html")
         else:
-            respuesta = HttpResponseBadRequest("Datos inválidos.")
+            respuesta = HttpResponseBadRequest("Datos inválidos.") 
     else:
         respuesta = HttpResponseBadRequest("No tiene permiso para el método utilizado.")
     context = {
         'contacto_form' : formulario      
     }
     return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
+
+def mensaje_envio(request):
+    return render(request, "core/pages/mensaje_envio.html")
+
 
 @login_required
 def clientes(request):
