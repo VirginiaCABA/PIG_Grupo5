@@ -4,8 +4,10 @@ from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Postulante, Paquete, Domicilio
-from .forms import ContactoForm, PedidoForm, PaqueteFormSet, DomicilioFormSet
+from .models import Postulante, Paquete, Domicilio, Cliente
+from .forms import ContactoForm, PedidoForm, PaqueteFormSet, DomicilioFormSet, RegistroClienteForm
+from django.contrib import messages
+
 
 # Create your views here.
 
@@ -67,6 +69,43 @@ def contacto(request):
         'contacto_form' : formulario      
     }
     return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
+
+def registrocliente(request):
+    if request.method == 'POST':
+        form = RegistroClienteForm(request.POST)
+        if form.is_valid():
+            nombre = form.cleaned_data['nombre']
+            apellido = form.cleaned_data['apellido']
+            cuit = form.cleaned_data['cuit']
+            mail = form.cleaned_data['mail']
+            calle = form.cleaned_data['calle']
+            numero = form.cleaned_data['numero']
+            cp = form.cleaned_data['cp']
+            piso = form.cleaned_data['piso']
+            departamento = form.cleaned_data['departamento']
+            password = form.cleaned_data['password']
+            password2 = form.cleaned_data['password2']
+
+            if password == password2:
+                # Controla si el usuario ya existe
+                if Cliente.objects.filter(mail=mail).exists():
+                    messages.error(request, 'Este cliente ya existe.')
+                    messages.info(request, 'Este cliente ya existe INFO.')
+                    # return redirect('login')
+                else:
+                    # Crea el usuario
+                    domicilio = Domicilio(calle=calle, numero=numero, cp=cp, piso=piso, departamento=departamento, latitud=0, longitud=0)
+                    domicilio.save()
+                    cliente = Cliente(nombre=nombre, apellido=apellido, cuit=cuit, mail=mail, domicilio_id=domicilio.id, baja=False)
+                    cliente.save()
+    
+                    messages.success(request, 'Cliente registrado exitosamente.')
+                    return redirect('login')  # Redirecciona a otra pàagina una vez que se registra
+            else:
+                messages.error(request, 'Las contraseñas no coinciden.')
+    else:
+        form = RegistroClienteForm()
+    return render(request,"core/pages/registro_cliente.html", {'form': form})
 
 
 @login_required

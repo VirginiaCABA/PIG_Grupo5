@@ -15,6 +15,9 @@ class Domicilio(models.Model):
     longitud = models.FloatField(verbose_name="Longitud")
     objects = models.Manager()
 
+    def __str__(self):
+        return f"{self.calle}, {self.numero}"
+
 class EstadoPedido(models.TextChoices): #Estado de Pedido
     RECIBIDO = '1', 'Recibido'
     PROCESADO = '2', 'Procesado'

@@ -2,6 +2,7 @@ from django import forms
 from django.forms import ValidationError, ModelForm, modelformset_factory
 from django.core.validators import validate_email
 from .models import Domicilio, Pedido, Paquete
+from django.contrib.auth.models import User
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -98,3 +99,26 @@ class PedidoForm(ModelForm):
             'domicilio_destino': forms.HiddenInput(),
         }
 
+class RegistroClienteForm(forms.Form):
+    nombre = forms.CharField(label='Nombre', min_length=2)
+    apellido = forms.CharField(label='Apellido', min_length=2)
+    cuit = forms.IntegerField(label='DNI ó CUIT')
+    mail = forms.EmailField(label='Correo Electrónico')
+    calle = forms.CharField(label='Calle', min_length=2)
+    numero = forms.IntegerField(label='Número')
+    cp = forms.IntegerField(label='Código Postal')
+    piso = forms.IntegerField(label='Piso')
+    departamento = forms.CharField(label='Departamento')
+    password = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
+    password2 = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
+
+    def clean_mail(self):
+        if User.objects.filter(username=self.cleaned_data['mail']).exists():
+            raise ValidationError("El cliente ya está registrado")
+        return self.cleaned_data['mail']
+    
+    def clean(self):
+        if self.cleaned_data['password'] != self.cleaned_data['password2']:
+            print("La contraseña no es correcta")
+            raise ValidationError("La contraseña no coincide")
+        return self.cleaned_data

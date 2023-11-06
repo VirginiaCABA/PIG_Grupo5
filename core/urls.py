@@ -23,6 +23,7 @@ urlpatterns = [
     path('servicios/', servicios, name='servicios'),
     path('contacto/', contacto, name='contacto'),
     path('clientes/', clientes, name='clientes'),
+    path('registro/', registrocliente, name='registrocliente'),
     re_path(r'^empleados/(?P<fecha>\d{4}-\d{2}-\d{2})/$',  empleados, name='empleados'),
     path('logout/', exit, name='exit'),
 ]
