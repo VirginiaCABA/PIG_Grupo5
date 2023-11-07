@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from .models import Postulante, Paquete, Domicilio, Cliente
-from .forms import ContactoForm, PedidoForm, PaqueteFormSet, DomicilioFormSet, RegistroClienteForm
+from .forms import ContactoForm, PedidoForm, PaqueteFormSet, DomicilioFormSet, ClienteForm
 from django.contrib import messages
 
 
@@ -72,17 +72,9 @@ def contacto(request):
 
 def registrocliente(request):
     if request.method == 'POST':
-        form = RegistroClienteForm(request.POST)
+        form = ClienteForm(request.POST)
         if form.is_valid():
-            nombre = form.cleaned_data['nombre']
-            apellido = form.cleaned_data['apellido']
-            cuit = form.cleaned_data['cuit']
             mail = form.cleaned_data['mail']
-            calle = form.cleaned_data['calle']
-            numero = form.cleaned_data['numero']
-            cp = form.cleaned_data['cp']
-            piso = form.cleaned_data['piso']
-            departamento = form.cleaned_data['departamento']
             password = form.cleaned_data['password']
             password2 = form.cleaned_data['password2']
 
@@ -94,17 +86,13 @@ def registrocliente(request):
                     # return redirect('login')
                 else:
                     # Crea el usuario
-                    domicilio = Domicilio(calle=calle, numero=numero, cp=cp, piso=piso, departamento=departamento, latitud=0, longitud=0)
-                    domicilio.save()
-                    cliente = Cliente(nombre=nombre, apellido=apellido, cuit=cuit, mail=mail, domicilio_id=domicilio.id, baja=False)
-                    cliente.save()
-    
+                    form.save()
                     messages.success(request, 'Cliente registrado exitosamente.')
                     return redirect('login')  # Redirecciona a otra pàagina una vez que se registra
             else:
                 messages.error(request, 'Las contraseñas no coinciden.')
     else:
-        form = RegistroClienteForm()
+        form = ClienteForm()
     return render(request,"core/pages/registro_cliente.html", {'form': form})
 
 

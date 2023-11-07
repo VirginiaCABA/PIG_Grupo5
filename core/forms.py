@@ -74,19 +74,8 @@ class ContactoForm(forms.Form):
     )
 
 DomicilioFormSet = modelformset_factory(Domicilio, fields='__all__', extra=1)
-""" class DomicilioForm(ModelForm):
-    class Meta:
-        model = Domicilio
-        fields = '__all__' """
 
 PaqueteFormSet = modelformset_factory(Paquete, fields='__all__', widgets={'pedido': forms.HiddenInput()}, extra=1)
-""" class PaqueteForm(ModelForm):
-    class Meta:
-        model = Paquete
-        fields = '__all__'
-        widgets = {
-            'pedido': forms.HiddenInput(),
-        } """
 
 class PedidoForm(ModelForm):
     """Crea el formulario de pedidos"""
@@ -99,16 +88,9 @@ class PedidoForm(ModelForm):
             'domicilio_destino': forms.HiddenInput(),
         }
 
-class RegistroClienteForm(forms.Form):
-    nombre = forms.CharField(label='Nombre', min_length=2)
-    apellido = forms.CharField(label='Apellido', min_length=2)
-    cuit = forms.IntegerField(label='DNI ó CUIT')
-    mail = forms.EmailField(label='Correo Electrónico')
-    calle = forms.CharField(label='Calle', min_length=2)
-    numero = forms.IntegerField(label='Número')
-    cp = forms.IntegerField(label='Código Postal')
-    piso = forms.IntegerField(label='Piso')
-    departamento = forms.CharField(label='Departamento')
+class ClienteForm(ModelForm):
+    fields = '__all__'
+    domicilio = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
     password = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
     password2 = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
 

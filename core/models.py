@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.query import QuerySet
 from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
 
@@ -17,6 +16,9 @@ class Domicilio(models.Model):
 
     def __str__(self):
         return f"{self.calle}, {self.numero}"
+    
+    class Meta():
+        verbose_name_plural = 'Domicilios'
 
 class EstadoPedido(models.TextChoices): #Estado de Pedido
     RECIBIDO = '1', 'Recibido'
@@ -45,6 +47,9 @@ class Sucursal(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     numero = models.IntegerField(verbose_name="Número")
     domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+
+    class Meta():
+        verbose_name_plural = 'Sucursales'
 
 class Persona(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
