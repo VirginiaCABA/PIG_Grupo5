@@ -15,10 +15,12 @@ Including another URLconf
 """
 
 from django.urls import path, re_path
+from core.admin import admin_custom
 from core.views import *
 
 urlpatterns = [
     path('', home, name='home'),
+    path('administracion/', admin_custom.urls),
     path('nosotros/', nosotros, name='nosotros'),
     path('servicios/', servicios, name='servicios'),
     path('contacto/', contacto, name='contacto'),

@@ -3,19 +3,57 @@ from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
 
 # Create your models here.
+
+class Provincia(models.Model):
+    idprovincia = models.AutoField(primary_key=True),
+    nombre = models.CharField(max_length=100, verbose_name='Nombre')
+    baja = models.BooleanField(default=False)
+
+    def soft_delete(self):
+        self.baja = True
+        super().save()
+
+    def restore(self):
+        self.baja = False
+        super().save()
+
+class Localidad(models.Model):
+    idlocalidad = models.AutoField(primary_key=True),
+    idprovincia = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
+    nombre = models.CharField(max_length=100, verbose_name='Nombre')
+    baja = models.BooleanField(default=False)
+
+    def soft_delete(self):
+        self.baja = True
+        super().save()
+
+    def restore(self):
+        self.baja = False
+        super().save()
+
 class Domicilio(models.Model):
     iddomicilio = models.AutoField(primary_key=True),
+    idlocalidad = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
     calle = models.CharField(max_length=150, verbose_name='Calle')
     numero = models.IntegerField(verbose_name="Número")
-    cp = models.IntegerField(verbose_name="Código Postal")
     piso = models.IntegerField(verbose_name="Piso")
     departamento = models.CharField(max_length=150, verbose_name='Dpto')
+    cp = models.IntegerField(verbose_name="Código Postal")
     latitud = models.FloatField(verbose_name="Latitud")
     longitud = models.FloatField(verbose_name="Longitud")
+    baja = models.BooleanField(default=False)
     objects = models.Manager()
 
     def __str__(self):
         return f"{self.calle}, {self.numero}"
+    
+    def soft_delete(self):
+        self.baja = True
+        super().save()
+
+    def restore(self):
+        self.baja = False
+        super().save()
     
     class Meta():
         verbose_name_plural = 'Domicilios'
@@ -30,12 +68,12 @@ class EstadoPedido(models.TextChoices): #Estado de Pedido
 
 class Pedido(models.Model):
     idpedido = models.AutoField(primary_key=True),
+    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
     estado = models.CharField(max_length=3, choices=EstadoPedido.choices, default=EstadoPedido.RECIBIDO)
-    domicilio_destino = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
 
 class Paquete(models.Model):
     idpaquete = models.AutoField(primary_key=True),
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)  # relacion muchos a uno
+    idpedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)  # relacion muchos a uno
     peso = models.FloatField(verbose_name="Peso")
     ancho = models.FloatField(verbose_name="Ancho")
     largo = models.FloatField(verbose_name="Largo")
@@ -44,9 +82,9 @@ class Paquete(models.Model):
 
 class Sucursal(models.Model):
     idsucursal =  models.AutoField(primary_key=True),
+    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     numero = models.IntegerField(verbose_name="Número")
-    domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
 
     class Meta():
         verbose_name_plural = 'Sucursales'
@@ -130,7 +168,7 @@ class ClienteManager(models.Manager):
 class Cliente(Persona):
     idcliente = models.AutoField(primary_key=True),
     cuit = models.IntegerField(verbose_name="CUIT")
-    domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
     objects = ClienteManager()
 
     def __str__(self):

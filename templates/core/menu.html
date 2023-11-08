@@ -18,9 +18,15 @@
         <li><a href="{% url 'servicios' %}">Servicios</a></li>
         <li><a href="{% url 'contacto' %}">Contacto</a></li>
         {% if request.user.is_authenticated %}
-            <li><a href="{% url 'clientes' %}">Clientes</a></li>
-            <li><a href="{% url 'empleados' fecha='2023-09-20' %}">Empleados</a></li>
-            <li><a href="/admin">Administración</a></li>
+            {% if request.user.groups.all.0.name == "cliente" %}
+                <li><a href="{% url 'clientes' %}">Clientes</a></li>
+            {% endif %}
+            {% if request.user.groups.all.0.name == "empleado" %}
+                <li><a href="{% url 'empleados' fecha='2023-09-20' %}">Empleados</a></li>
+            {% endif %}
+            {% if request.user.groups.all.0.name == "administrador" or request.user.is_superuser %}
+                <li><a href="/administracion">Administración</a></li>
+            {% endif %}
             <li><a href="{% url 'exit' %}">Salir</a></li>
         {% else %}
             <li><a href="{% url 'login' %}">Ingresar</a></li>

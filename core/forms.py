@@ -82,15 +82,15 @@ class PedidoForm(ModelForm):
     class Meta:
         model = Pedido
         fields = '__all__'
-        domicilio_destino = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
+        iddomicilio = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
         paquetes = PaqueteFormSet(queryset=Paquete.objects.none(), prefix='paquetes')
         widgets = {
-            'domicilio_destino': forms.HiddenInput(),
+            'iddomicilio': forms.HiddenInput(),
         }
 
 class ClienteForm(ModelForm):
     fields = '__all__'
-    domicilio = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
+    iddomicilio = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
     password = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
     password2 = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
 
