@@ -14,6 +14,7 @@
             <h2>Registro de Cliente</h2>
             {% csrf_token %}
             {{form.as_p}}
+            {{domicilio.as_p}}
             <button type="submit">Registrarse</button>
         </form>
     </div>

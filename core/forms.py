@@ -1,8 +1,8 @@
 from django import forms
-from django.forms import ValidationError, ModelForm, modelformset_factory
+from django.forms import ValidationError, ModelForm
 from django.core.validators import validate_email
-from .models import Domicilio, Pedido, Paquete
 from django.contrib.auth.models import User
+from .models import Pedido, Cliente, Domicilio
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -73,34 +73,35 @@ class ContactoForm(forms.Form):
                                      'class': 'form-control'})
     )
 
-DomicilioFormSet = modelformset_factory(Domicilio, fields='__all__', extra=1)
-
-PaqueteFormSet = modelformset_factory(Paquete, fields='__all__', widgets={'pedido': forms.HiddenInput()}, extra=1)
-
 class PedidoForm(ModelForm):
     """Crea el formulario de pedidos"""
     class Meta:
         model = Pedido
         fields = '__all__'
-        iddomicilio = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
-        paquetes = PaqueteFormSet(queryset=Paquete.objects.none(), prefix='paquetes')
-        widgets = {
-            'iddomicilio': forms.HiddenInput(),
-        }
+
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password']
+
+class DomicilioForm(ModelForm):
+    class Meta:
+        model = Domicilio
+        fields = '__all__'
 
 class ClienteForm(ModelForm):
-    fields = '__all__'
-    iddomicilio = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
-    password = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
-    password2 = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
+    contrasenia = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
+    confirmar_contrasenia = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
+
+    def clean(self):
+        if self.cleaned_data['contrasenia'] != self.cleaned_data['confirmar_contrasenia']:
+            raise ValidationError("La contraseñas no coinciden")
+        return self.cleaned_data
 
     def clean_mail(self):
         if User.objects.filter(username=self.cleaned_data['mail']).exists():
             raise ValidationError("El cliente ya está registrado")
         return self.cleaned_data['mail']
-    
-    def clean(self):
-        if self.cleaned_data['password'] != self.cleaned_data['password2']:
-            print("La contraseña no es correcta")
-            raise ValidationError("La contraseña no coincide")
-        return self.cleaned_data
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'apellido', 'cuit', 'mail']

@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -138,13 +139,15 @@ class EmpleadoManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(baja=False)
 
-class Empleado(Postulante):
+class Empleado(Persona):
     idempleado = models.AutoField(primary_key=True),
+    idpostulante = models.ForeignKey(Postulante, on_delete=models.CASCADE)  # relacion muchos a uno
     pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
     objects = EmpleadoManager()
 
     def __str__(self):
-        return f"{self.dni} - " + super().__str__()
+        postulante = Postulante.objects.filter(idpostulante=self.idpostulante)
+        return f"{postulante.dni} - " + super().__str__()
 
     def obtener_baja_url(self):
         return reverse_lazy('empleado_baja', args=[self.idempleado])
@@ -168,6 +171,7 @@ class ClienteManager(models.Manager):
 class Cliente(Persona):
     idcliente = models.AutoField(primary_key=True),
     cuit = models.IntegerField(verbose_name="CUIT")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
     objects = ClienteManager()
 

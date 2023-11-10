@@ -1,16 +1,15 @@
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
-from .models import Postulante, Paquete, Domicilio, Cliente
-from .forms import ContactoForm, PedidoForm, PaqueteFormSet, DomicilioFormSet, ClienteForm
-from django.contrib import messages
-
+from django.views.generic.edit import CreateView
+from .models import Postulante
+from .forms import ContactoForm, PedidoForm, ClienteForm, DomicilioForm
 
 # Create your views here.
-
 def home(request):
     '''Devuelve la vista principal del sitio.'''
     return render(request ,"core/pages/home.html")
@@ -70,69 +69,48 @@ def contacto(request):
     }
     return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
 
-def registrocliente(request):
-    if request.method == 'POST':
-        form = ClienteForm(request.POST)
-        if form.is_valid():
-            mail = form.cleaned_data['mail']
-            password = form.cleaned_data['password']
-            password2 = form.cleaned_data['password2']
-
-            if password == password2:
-                # Controla si el usuario ya existe
-                if Cliente.objects.filter(mail=mail).exists():
-                    messages.error(request, 'Este cliente ya existe.')
-                    messages.info(request, 'Este cliente ya existe INFO.')
-                    # return redirect('login')
-                else:
-                    # Crea el usuario
-                    form.save()
-                    messages.success(request, 'Cliente registrado exitosamente.')
-                    return redirect('login')  # Redirecciona a otra pàagina una vez que se registra
-            else:
-                messages.error(request, 'Las contraseñas no coinciden.')
-    else:
-        form = ClienteForm()
-    return render(request,"core/pages/registro_cliente.html", {'form': form})
-
-
 @login_required
 def clientes(request):
     '''Recibe los datos del usuario y devuelve la vista de clientes.'''
-    if (request.method == 'POST'):
+    pedidos = {
+        'headers' : 
+            [ 'Fecha pedido', 'Descripción', 'Lugar de Entrega' ],
+        'rows' : 
+            [
+                [ '2012-09-14 14:23', 'Cosa 1', 'Rivadavia 1245' ],
+                [ '2012-09-14 16:51', 'Cosa 2', 'San Martín 3200' ]
+            ]
+    }
+    return render(request ,"core/pages/clientes.html", { 'pedidos': pedidos })
+
+
+class ClienteCreateView(CreateView):
+    '''Devuelve el formulario de registro del nuevo cliente'''
+    template_name = 'core/pages/registrar_cliente.html'
+    form_class = ClienteForm
+    second_form_class = DomicilioForm
+    success_url = '/login/'
+
+    def post(self, request, *args, **kwargs):
+        cliente = self.form_class(request.POST)
+        domicilio = self.second_form_class(request.POST, prefix='domicilio')
         
-        pedido_form = PedidoForm(request.POST)
-        domicilio_formset = DomicilioFormSet(request.POST, prefix='domicilios', queryset=Domicilio.objects.none())
-        paquete_formset = PaqueteFormSet(request.POST, prefix='paquetes', queryset=Paquete.objects.none())
+        if domicilio.is_valid():
+            domicilio = domicilio.save(commit=False)
+            domicilio.save()
+            if cliente.is_valid():
+                cliente.domicilio = domicilio
+                cliente.save()
+            return redirect(self.request.path)
 
-        if pedido_form.is_valid():
-            pedido = pedido_form.save()
-            
-            """ if domicilio_formset.is_valid():
-                domicilio_formset.save(commit=False)
-                for form in domicilio_formset.forms:
-                    domicilio = form.save(commit=False)
-                    domicilio.pedido = pedido
-                    domicilio.save() """
+class PedidoCreateView(LoginRequiredMixin, CreateView):
+    '''Devuelve el formulario de solicitud de envío'''
+    template_name = 'core/pages/registrar_pedido.html'
+    form_class = PedidoForm
+    success_url = '/clientes/'
 
-            if paquete_formset.is_valid():
-                paquete_formset.save(commit=False)
-                for form in paquete_formset.forms:
-                    paquete = form.save(commit=False)
-                    paquete.pedido = pedido
-                    paquete.save()
-
-            return HttpResponse('Pedido cargado')
-    else:
-        pedido_form = PedidoForm()
-        domicilio_formset = DomicilioFormSet(queryset=Domicilio.objects.none(), prefix='domicilio')
-        paquete_formset = PaqueteFormSet(queryset=Paquete.objects.none(), prefix='paquetes')
-
-    return render(request ,"core/pages/clientes.html", {
-        'pedido_form': pedido_form,
-        'domicilio_formset': domicilio_formset,
-        'paquete_formset': paquete_formset
-        })
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 @login_required
 def empleados(request, fecha):

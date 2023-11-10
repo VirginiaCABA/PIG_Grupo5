@@ -14,31 +14,30 @@
 
     {% block content %}
 
-        <h3>Panel de Clientes</h3><br>
-
-        <section class="section">
-            <div class="formulario p-1">
-                <form action='{% url "clientes" %}' method="POST" id="form">
-                    {% csrf_token %}
-                    
-                    {{ pedido_form.as_p }}
-                    {{ domicilio_formset.management_form }}
-                    {{ paquete_formset.management_form }}
-
-                    <h2>Domicilio de destino</h2>
-                    {% for form in domicilio_formset %}
-                        {{ form.as_p }}
+        {% if pedidos %}
+            <br><h3>Panel de Clientes</h3>
+            <br><p>Éstas son los pedidos que ha solicitado.</p><br>
+            <table class="table table-responsive w-100">
+                <thead>
+                    <tr>
+                        {% for header in pedidos.headers %}
+                            <td>{{ header }}</td>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pedidos.rows %}
+                        <tr>
+                            {% for col in row %}
+                                <td>{{ col }}</td>
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
-
-                    <h2>Paquetes</h2>
-                    {% for form in paquete_formset %}
-                        {{ form.as_p }}
-                    {% endfor %}
-                    
-                    <button type="submit">Enviar</button>
-                </form>
-            </div>
-        </section>
+                </tbody>
+            </table>
+        {% else %}
+            <p>Todavía no ha solicitado un pedido de envío.</p>
+        {% endif %}
 
     {% endblock %}
 

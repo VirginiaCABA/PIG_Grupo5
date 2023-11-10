@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+
+{% block title %} Codo a Codo - Logística - Clientes {% endblock %}
+
+{% if request.user.is_authenticated %}
+
+    {% load static %}
+
+    {% block links %}
+        <link rel="stylesheet" href="{% static 'core/styles/clientes.css' %}">
+        <script src="{% static 'core/js/clientes.js' %}"></script>
+
+    {% endblock %}
+
+    {% block content %}
+
+        <h3>Formulario de Pedido de Envío</h3><br>
+
+        <section class="section">
+            <div class="formulario p-1">
+                <form action='{% url "clientes" %}' method="POST" id="form">
+                    {% csrf_token %}
+                    
+                    {{ pedido_form.as_p }}
+                    {{ domicilio_formset.management_form }}
+                    {{ paquete_formset.management_form }}
+
+                    <h2>Domicilio de destino</h2>
+                    {% for form in domicilio_formset %}
+                        {{ form.as_p }}
+                    {% endfor %}
+
+                    <h2>Paquetes</h2>
+                    {% for form in paquete_formset %}
+                        {{ form.as_p }}
+                    {% endfor %}
+                    
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
+        </section>
+
+    {% endblock %}
+
+{% else %}
+
+    <p>No tiene permiso para acceder a esta pagina.</p>
+
+{% endif %}
