@@ -1,6 +1,8 @@
 from django import forms
-from django.forms import ValidationError
+from django.forms import ValidationError, ModelForm
 from django.core.validators import validate_email
+from django.contrib.auth.models import User
+from .models import Pedido, Cliente, Domicilio
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -29,7 +31,7 @@ def validar_mail(value):
 class ContactoForm(forms.Form):
     """Devuelve el formulario de contactos"""
     nombre = forms.CharField(
-        label='Nombre de contacto',
+        label='Nombre',
         max_length=50,
         required=True,
         validators=[solo_caracteres],
@@ -37,7 +39,7 @@ class ContactoForm(forms.Form):
                                       'placeholder': 'Solo letras'})
     )
     apellido = forms.CharField(
-        label='Apellido de contacto',
+        label='Apellido',
         max_length=50,
         required=True,
         validators=[solo_caracteres],
@@ -45,7 +47,7 @@ class ContactoForm(forms.Form):
                                       'placeholder': 'Solo letras'})
     )
     dni = forms.CharField(
-         label="DNI de contacto",
+         label="DNI",
          max_length=8,
          required=True,
          validators=[solo_numeros],
@@ -71,48 +73,35 @@ class ContactoForm(forms.Form):
                                      'class': 'form-control'})
     )
 
-class PedidoForm(forms.Form):
-    """Devuelve el formulario de pedidos"""
-    SERVICIOS_CHOICES = [
-        ("0", "Servicios"),
-        ("1", "Courier - Mensajería - Cadetes fijos"),
-        ("2", "Transportes y cargas"),
-        ("3", "E-Commerce y distribución de paquetería")
-        ]
-    servicios = forms.ChoiceField(label="Elige el servicio a contratar", required=True,
-                                  widget=forms.Select, choices=SERVICIOS_CHOICES)
-    direccion = forms.CharField(label="Dirección recolección", max_length="100", required=True,
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-    codigo_postal = forms.CharField(label="Código Postal", max_length="100", required=True,
-                                    widget=forms.TextInput(attrs={"class": "form-control"}))
-    altura = forms.CharField(label="No. Exterior (altura)", max_length="100", required=True,
-                             widget=forms.TextInput(attrs={"class": "form-control"}))
-    piso_dpto = forms.CharField(label="No. Interior (opcional)", max_length="100",
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-    instrucciones = forms.CharField(label="Instrucciones (opcional)", max_length="100",
-                                    widget=forms.TextInput(attrs={"class": "form-control"}))
+class PedidoForm(ModelForm):
+    """Crea el formulario de pedidos"""
+    class Meta:
+        model = Pedido
+        fields = '__all__'
 
-    nombre = forms.CharField(label="Nombre *", max_length="100", required=True,
-                             widget=forms.TextInput(attrs={"class": "form-control"}))
-    telefono = forms.DecimalField(label="Telefono *", max_digits="20", required=True,
-                                  widget=forms.NumberInput(attrs={"class": "form-control"}))
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password']
 
-    nombre_alternativo = forms.CharField(label="Nombre *", max_length="100", required=True,
-                                         widget=forms.TextInput(attrs={"class": "form-control"}))
-    telefono_alternativo = forms.DecimalField(label="Telefono *", max_digits="20", required=True,
-                                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+class DomicilioForm(ModelForm):
+    class Meta:
+        model = Domicilio
+        fields = '__all__'
 
-    PAQUETE_CHOICES = [
-		("", "Elige el tipo de paquete"),
-		("1", "Sobre - Mensajero con mochila (Documentos, libros, sobres, etc)"),
-		("2", "Caja pequeña - Máximo: Ancho:39.5 cm Alto:30.5cm, Peso: 1kg"),
-		("3", "Caja mediana - Máximo: 30 L x 40 An x 30 Al (Hasta 15KG)"),
-		("4", "Caja grande - Máximo: 40L x 50 An x 40 Al. (Hasta 25kg)")
-	]
-    paquete = forms.ChoiceField( label="Elige el tipo de paquete", 
-                                widget=forms.Select, choices=PAQUETE_CHOICES, required=True)
-    referencia = forms.CharField(label="Referencia", max_length="100", 
-                                 widget=forms.TextInput(attrs={"class": "form-control"}))
-    comentarios = forms.CharField(label="Comentarios", max_length="100", 
-                                  widget=forms.Textarea(attrs={"class": "form-control"}))
+class ClienteForm(ModelForm):
+    contrasenia = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
+    confirmar_contrasenia = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
 
+    def clean(self):
+        if self.cleaned_data['contrasenia'] != self.cleaned_data['confirmar_contrasenia']:
+            raise ValidationError("La contraseñas no coinciden")
+        return self.cleaned_data
+
+    def clean_mail(self):
+        if User.objects.filter(username=self.cleaned_data['mail']).exists():
+            raise ValidationError("El cliente ya está registrado")
+        return self.cleaned_data['mail']
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'apellido', 'cuit', 'mail']

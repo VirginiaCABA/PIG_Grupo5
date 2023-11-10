@@ -1,14 +1,15 @@
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
-from .forms import PedidoForm, ContactoForm
-from .models import Contacto
+from django.views.generic.edit import CreateView
+from .models import Postulante
+from .forms import ContactoForm, PedidoForm, ClienteForm, DomicilioForm
 
 # Create your views here.
-
 def home(request):
     '''Devuelve la vista principal del sitio.'''
     return render(request ,"core/pages/home.html")
@@ -38,13 +39,13 @@ def contacto(request):
             mensaje = formulario.cleaned_data['mensaje']
             curriculum = request.FILES['curriculum']
             #verificar que no existe el mail en la BD
-            if Contacto.objects.filter(mail=mail).exists():
-                respuesta = HttpResponseBadRequest("El Email {mail} ya esta registrado.".format(mail=mail))
+            if Postulante.objects.filter(mail=mail).exists():
+                respuesta = HttpResponseBadRequest(f"El Email {mail} ya esta registrado.")
             else:
                 #guardar los datos en la BD
-                nuevo_contacto = Contacto(nombre=nombre, apellido=apellido, dni=dni,
+                nuevo_postulante = Postulante(nombre=nombre, apellido=apellido, dni=dni,
                                         mail=mail, mensaje=mensaje, curriculum=curriculum)
-                nuevo_contacto.save()
+                nuevo_postulante.save()
                 #formatear mensaje de respuesta
                 mensaje_html = f'Mensaje de contacto de {nombre} {apellido} (DNI: {dni}):\n {mensaje}'
                 #Y finalmente, se envía el mail
@@ -53,14 +54,14 @@ def contacto(request):
                     mensaje_html,
                     settings.EMAIL_HOST_USER,
                     [mail],  # Lista de destinatarios
-                )
+                ) 
                 email.attach(curriculum.name,
                             curriculum.read(),
                             curriculum.content_type)
                 email.send()
-                respuesta = HttpResponse('Correo enviado con éxito') #ver si cambio a ResponseRedirect
+                respuesta = HttpResponseRedirect("core/pages/mensaje_envio.html")
         else:
-            respuesta = HttpResponseBadRequest("Datos inválidos.")
+            respuesta = HttpResponseBadRequest("Datos inválidos.") 
     else:
         respuesta = HttpResponseBadRequest("No tiene permiso para el método utilizado.")
     context = {
@@ -71,7 +72,45 @@ def contacto(request):
 @login_required
 def clientes(request):
     '''Recibe los datos del usuario y devuelve la vista de clientes.'''
-    return render(request ,"core/pages/clientes.html")
+    pedidos = {
+        'headers' : 
+            [ 'Fecha pedido', 'Descripción', 'Lugar de Entrega' ],
+        'rows' : 
+            [
+                [ '2012-09-14 14:23', 'Cosa 1', 'Rivadavia 1245' ],
+                [ '2012-09-14 16:51', 'Cosa 2', 'San Martín 3200' ]
+            ]
+    }
+    return render(request ,"core/pages/clientes.html", { 'pedidos': pedidos })
+
+
+class ClienteCreateView(CreateView):
+    '''Devuelve el formulario de registro del nuevo cliente'''
+    template_name = 'core/pages/registrar_cliente.html'
+    form_class = ClienteForm
+    second_form_class = DomicilioForm
+    success_url = '/login/'
+
+    def post(self, request, *args, **kwargs):
+        cliente = self.form_class(request.POST)
+        domicilio = self.second_form_class(request.POST, prefix='domicilio')
+        
+        if domicilio.is_valid():
+            domicilio = domicilio.save(commit=False)
+            domicilio.save()
+            if cliente.is_valid():
+                cliente.domicilio = domicilio
+                cliente.save()
+            return redirect(self.request.path)
+
+class PedidoCreateView(LoginRequiredMixin, CreateView):
+    '''Devuelve el formulario de solicitud de envío'''
+    template_name = 'core/pages/registrar_pedido.html'
+    form_class = PedidoForm
+    success_url = '/clientes/'
+
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 @login_required
 def empleados(request, fecha):
@@ -91,14 +130,3 @@ def exit(request):
     '''Cierre la sesión y envía al home'''
     logout(request)
     return redirect('home')
-
-def crear_pedido(request):
-    if (request.method == 'POST'):
-        form = PedidoForm(request.POST)
-        if form.is_valid():
-            servicios = form.cleaned_data['servicios']
-            # return render(request, 'success.html')
-    else:
-        form = PedidoForm()
-    return render(request,"core/crear_pedido.html", {'form': form})
-

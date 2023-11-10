@@ -15,15 +15,18 @@ Including another URLconf
 """
 
 from django.urls import path, re_path
+from core.admin import admin_custom
 from core.views import *
 
 urlpatterns = [
     path('', home, name='home'),
+    path('administracion/', admin_custom.urls),
     path('nosotros/', nosotros, name='nosotros'),
     path('servicios/', servicios, name='servicios'),
     path('contacto/', contacto, name='contacto'),
     path('clientes/', clientes, name='clientes'),
+    path('registrar_cliente/', ClienteCreateView.as_view(), name='registrar_cliente'),
+    path('registrar_pedido/', PedidoCreateView.as_view(), name='registrar_pedido'),
     re_path(r'^empleados/(?P<fecha>\d{4}-\d{2}-\d{2})/$',  empleados, name='empleados'),
     path('logout/', exit, name='exit'),
-    path('crear_pedido/', crear_pedido, name='crear_pedido'),
 ]
