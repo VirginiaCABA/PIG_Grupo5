@@ -83,25 +83,28 @@ def clientes(request):
     }
     return render(request ,"core/pages/clientes.html", { 'pedidos': pedidos })
 
+class DomicilioCreateView(CreateView):
+    '''Devuelve el formulario de registro del nuevo domicilio'''
+    template_name = 'core/pages/registrar_cliente.html'
+    form_class = DomicilioForm
+    success_url = '/registrar_cliente/'
 
+    def post(self, request, *args, **kwargs):
+        domicilio = self.form_class(request.POST)
+        if domicilio.is_valid():
+            domicilio.save()
+        return redirect(self.request.path) 
 class ClienteCreateView(CreateView):
     '''Devuelve el formulario de registro del nuevo cliente'''
     template_name = 'core/pages/registrar_cliente.html'
     form_class = ClienteForm
-    second_form_class = DomicilioForm
     success_url = '/login/'
 
     def post(self, request, *args, **kwargs):
         cliente = self.form_class(request.POST)
-        domicilio = self.second_form_class(request.POST, prefix='domicilio')
-        
-        if domicilio.is_valid():
-            domicilio = domicilio.save(commit=False)
-            domicilio.save()
-            if cliente.is_valid():
-                cliente.domicilio = domicilio
-                cliente.save()
-            return redirect(self.request.path)
+        if cliente.is_valid():
+            cliente.save()
+        return redirect(self.request.path)
 
 class PedidoCreateView(LoginRequiredMixin, CreateView):
     '''Devuelve el formulario de solicitud de envío'''

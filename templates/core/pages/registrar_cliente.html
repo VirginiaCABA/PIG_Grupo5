@@ -3,7 +3,7 @@
 {% load static %} 
 
 {% block links %} 
-    <link rel="stylesheet" href="{% static 'core/styles/contacto.css' %}"> 
+    <link rel="stylesheet" href="{% static 'core/styles/cliente.css' %}"> 
     <script src="{% static 'core/js/login.js' %}"></script>
 {% endblock %} 
 
@@ -11,11 +11,10 @@
 
     <div class="container">
         <form action="" method="post" class="login-form">
-            <h2>Registro de Cliente</h2>
+            <h2>Registrarse</h2>
             {% csrf_token %}
             {{form.as_p}}
-            {{domicilio.as_p}}
-            <button type="submit">Registrarse</button>
+            <button type="submit">Continuar</button>
         </form>
     </div>
 

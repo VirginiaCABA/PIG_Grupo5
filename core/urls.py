@@ -25,6 +25,7 @@ urlpatterns = [
     path('servicios/', servicios, name='servicios'),
     path('contacto/', contacto, name='contacto'),
     path('clientes/', clientes, name='clientes'),
+    path('registrar_domicilio/', DomicilioCreateView.as_view(), name='registrar_domicilio'),
     path('registrar_cliente/', ClienteCreateView.as_view(), name='registrar_cliente'),
     path('registrar_pedido/', PedidoCreateView.as_view(), name='registrar_pedido'),
     re_path(r'^empleados/(?P<fecha>\d{4}-\d{2}-\d{2})/$',  empleados, name='empleados'),

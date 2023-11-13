@@ -79,19 +79,15 @@ class PedidoForm(ModelForm):
         model = Pedido
         fields = '__all__'
 
-class UserForm(ModelForm):
-    class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password']
-
 class DomicilioForm(ModelForm):
     class Meta:
         model = Domicilio
         fields = '__all__'
+        exclude = ['baja']
 
 class ClienteForm(ModelForm):
-    contrasenia = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
-    confirmar_contrasenia = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
+    #contrasenia = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
+    #confirmar_contrasenia = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
 
     def clean(self):
         if self.cleaned_data['contrasenia'] != self.cleaned_data['confirmar_contrasenia']:
@@ -102,6 +98,7 @@ class ClienteForm(ModelForm):
         if User.objects.filter(username=self.cleaned_data['mail']).exists():
             raise ValidationError("El cliente ya está registrado")
         return self.cleaned_data['mail']
+    
     class Meta:
         model = Cliente
-        fields = ['nombre', 'apellido', 'cuit', 'mail']
+        fields = ['username','password','nombre', 'apellido', 'cuit', 'mail', 'domicilio']

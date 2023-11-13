@@ -10,6 +10,9 @@ class Provincia(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     baja = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"{self.nombre}"
+
     def soft_delete(self):
         self.baja = True
         super().save()
@@ -23,6 +26,9 @@ class Localidad(models.Model):
     idprovincia = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     baja = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.nombre}"
 
     def soft_delete(self):
         self.baja = True
@@ -90,7 +96,7 @@ class Sucursal(models.Model):
     class Meta():
         verbose_name_plural = 'Sucursales'
 
-class Persona(models.Model):
+class Persona(User):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     apellido = models.CharField(max_length=150, verbose_name='Apellido')
     mail = models.EmailField(max_length=150, null=True)
@@ -106,6 +112,9 @@ class Persona(models.Model):
     def restore(self):
         self.baja = False
         super().save()
+
+    class Meta:
+        abstract = True
     
 class PostulanteManager(models.Manager):
 
@@ -139,15 +148,10 @@ class EmpleadoManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(baja=False)
 
-class Empleado(Persona):
+class Empleado(Postulante):
     idempleado = models.AutoField(primary_key=True),
-    idpostulante = models.ForeignKey(Postulante, on_delete=models.CASCADE)  # relacion muchos a uno
     pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
     objects = EmpleadoManager()
-
-    def __str__(self):
-        postulante = Postulante.objects.filter(idpostulante=self.idpostulante)
-        return f"{postulante.dni} - " + super().__str__()
 
     def obtener_baja_url(self):
         return reverse_lazy('empleado_baja', args=[self.idempleado])
@@ -171,8 +175,7 @@ class ClienteManager(models.Manager):
 class Cliente(Persona):
     idcliente = models.AutoField(primary_key=True),
     cuit = models.IntegerField(verbose_name="CUIT")
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+    domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
     objects = ClienteManager()
 
     def __str__(self):
