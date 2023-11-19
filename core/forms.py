@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ValidationError, ModelForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
-from .models import Pedido, Cliente, Domicilio
+from .models import Pedido, Cliente, Domicilio, Paquete, EstadoPedido
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -74,10 +74,24 @@ class ContactoForm(forms.Form):
     )
 
 class PedidoForm(ModelForm):
-    """Crea el formulario de pedidos"""
+    estado = forms.CharField(label="estado", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    estado = forms.ChoiceField(label="estado", choices=EstadoPedido.choices, widget=forms.Select(attrs={'class': 'form-control'}))
+    iddomicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+                       
     class Meta:
         model = Pedido
-        fields = '__all__'
+        fields=['iddomicilio','estado']
+
+class PaqueteForm(ModelForm):
+    peso = forms.CharField(label="Peso", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
+    ancho = forms.CharField(label="Ancho", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
+    largo = forms.CharField(label="Largo", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
+    alto = forms.CharField(label="Alto", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
+
+    class Meta:
+        model = Paquete
+        fields = ['peso','ancho','largo','alto']
+
 
 class DomicilioForm(ModelForm):
     class Meta:

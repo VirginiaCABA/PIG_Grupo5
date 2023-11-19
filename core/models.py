@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # Create your models here.
 
@@ -39,7 +40,6 @@ class Localidad(models.Model):
         super().save()
 
 class Domicilio(models.Model):
-    iddomicilio = models.AutoField(primary_key=True),
     idlocalidad = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
     calle = models.CharField(max_length=150, verbose_name='Calle')
     numero = models.IntegerField(verbose_name="Número")
@@ -73,19 +73,6 @@ class EstadoPedido(models.TextChoices): #Estado de Pedido
     NO_ENTREGADO_VISITA1 = '5','No entregado en 1er visita'
     NO_ENTREGADO_VISITA2 = '6','No entregado en 2da visita'
 
-class Pedido(models.Model):
-    idpedido = models.AutoField(primary_key=True),
-    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
-    estado = models.CharField(max_length=3, choices=EstadoPedido.choices, default=EstadoPedido.RECIBIDO)
-
-class Paquete(models.Model):
-    idpaquete = models.AutoField(primary_key=True),
-    idpedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)  # relacion muchos a uno
-    peso = models.FloatField(verbose_name="Peso")
-    ancho = models.FloatField(verbose_name="Ancho")
-    largo = models.FloatField(verbose_name="Largo")
-    alto = models.FloatField(verbose_name="Alto")
-    objects = models.Manager()
 
 class Sucursal(models.Model):
     idsucursal =  models.AutoField(primary_key=True),
@@ -148,24 +135,6 @@ class EmpleadoManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(baja=False)
 
-class Empleado(Postulante):
-    idempleado = models.AutoField(primary_key=True),
-    pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
-    objects = EmpleadoManager()
-
-    def obtener_baja_url(self):
-        return reverse_lazy('empleado_baja', args=[self.idempleado])
-
-    def obtener_modificacion_url(self):
-        return reverse_lazy('empleado_modificacion', args=[self.idempleado])
-
-    class Meta():
-        verbose_name_plural = 'Empleados'
-
-class AsignacionPedido(models.Model):
-    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    fecha = models.DateField()
 
 class ClienteManager(models.Manager):
 
@@ -190,3 +159,47 @@ class Cliente(Persona):
     class Meta():
         verbose_name_plural = 'Clientes'
 
+
+class Pedido(models.Model):
+    idpedido = models.AutoField(primary_key=True)
+    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+    idcliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # relacion muchos a uno
+    estado = models.CharField(max_length=3, choices=EstadoPedido.choices, default=EstadoPedido.RECIBIDO)
+    fecha_creacion = models.DateTimeField(default=timezone.now)
+
+
+class Paquete(models.Model):
+    idpaquete = models.AutoField(primary_key=True),
+    idpedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)  # relacion muchos a uno
+    peso = models.FloatField(verbose_name="Peso")
+    ancho = models.FloatField(verbose_name="Ancho")
+    largo = models.FloatField(verbose_name="Largo")
+    alto = models.FloatField(verbose_name="Alto")
+    objects = models.Manager()
+
+    def to_dict(self):
+        return {
+            'peso': str(self.peso),
+            'ancho': str(self.ancho),
+            'largo': str(self.largo),
+            'alto': str(self.alto),
+        }
+
+class Empleado(Postulante):
+    idempleado = models.AutoField(primary_key=True),
+    pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
+    objects = EmpleadoManager()
+
+    def obtener_baja_url(self):
+        return reverse_lazy('empleado_baja', args=[self.idempleado])
+
+    def obtener_modificacion_url(self):
+        return reverse_lazy('empleado_modificacion', args=[self.idempleado])
+
+    class Meta():
+        verbose_name_plural = 'Empleados'
+
+class AsignacionPedido(models.Model):
+    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    fecha = models.DateField()
