@@ -40,7 +40,7 @@ class Localidad(models.Model):
         super().save()
 
 class Domicilio(models.Model):
-    idlocalidad = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
+    idlocalidad = models.ForeignKey(Localidad, on_delete=models.CASCADE)  # relacion muchos a uno
     calle = models.CharField(max_length=150, verbose_name='Calle')
     numero = models.IntegerField(verbose_name="Número")
     piso = models.IntegerField(verbose_name="Piso")
@@ -52,7 +52,7 @@ class Domicilio(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return f"{self.calle}, {self.numero}"
+        return f"Provincia: {self.idlocalidad.idprovincia}, Localidad: {self.idlocalidad}, CP: {self.cp}, Calle: {self.calle}, Numero: {self.numero} "
     
     def soft_delete(self):
         self.baja = True
@@ -166,6 +166,9 @@ class Pedido(models.Model):
     idcliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # relacion muchos a uno
     estado = models.CharField(max_length=3, choices=EstadoPedido.choices, default=EstadoPedido.RECIBIDO)
     fecha_creacion = models.DateTimeField(default=timezone.now)
+
+    def get_estado(self):
+        return dict(EstadoPedido.choices)[self.estado]
 
 
 class Paquete(models.Model):

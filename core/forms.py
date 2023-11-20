@@ -74,13 +74,13 @@ class ContactoForm(forms.Form):
     )
 
 class PedidoForm(ModelForm):
-    estado = forms.CharField(label="estado", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
-    estado = forms.ChoiceField(label="estado", choices=EstadoPedido.choices, widget=forms.Select(attrs={'class': 'form-control'}))
+    estado = forms.CharField(label="estado", initial=EstadoPedido.RECIBIDO.label, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
     iddomicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
                        
     class Meta:
         model = Pedido
-        fields=['iddomicilio','estado']
+        fields=['iddomicilio']   
+
 
 class PaqueteForm(ModelForm):
     peso = forms.CharField(label="Peso", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))

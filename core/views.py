@@ -6,10 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import logout
 # from django.views.generic.edit import CreateView
-from .models import Postulante, Paquete, Pedido
+from .models import Postulante, Paquete, Pedido, EstadoPedido, Domicilio, Provincia, Localidad
 from .forms import ContactoForm, PedidoForm, ClienteForm, DomicilioForm, PaqueteForm
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from django.urls import reverse
+from django.shortcuts import render
 
 
 
@@ -101,10 +102,14 @@ class PedidosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     def test_func(self):
         return self.request.user.groups.filter(name='cliente').exists()
         
+    def get_queryset(self):
+        queryset = Paquete.objects.filter(idpedido__idcliente=self.request.user.id)
+        return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Pedidos"
+        context['headers'] = [ 'Id Pedido', 'Id Paquete', 'Fecha pedido', 'Descripción', 'Lugar de Entrega', 'Estado' ]
         # context['url_alta'] = reverse_lazy('estudiante_alta')
         return context
 
@@ -145,7 +150,7 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if submit_type == 'Guardar':
             pedido_form = PedidoForm(self.request.POST)
             if pedido_form.is_valid():
-                pedido = Pedido(estado=pedido_form.cleaned_data['estado'],iddomicilio_id=pedido_form.cleaned_data['iddomicilio'].id, idcliente_id=self.request.user.id)
+                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,iddomicilio_id=pedido_form.cleaned_data['iddomicilio'].id, idcliente_id=self.request.user.id)
                 pedido.save()
                 paquetes = self.request.session.get('paquetes', [])
                 for paquete_data in paquetes:
