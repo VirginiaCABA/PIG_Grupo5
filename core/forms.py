@@ -76,28 +76,71 @@ class ContactoForm(forms.Form):
 
 class PedidoForm(ModelForm):
     estado = forms.CharField(label="estado", initial=EstadoPedido.RECIBIDO.label, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
-    domicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-
-    """ def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['domicilio'].widget = widgets.ForeignKeySelect(
-            attrs={'class': 'form-control'},
-            allow_add=True,
-        ) """
+    iddomicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+                       
     class Meta:
         model = Pedido
-        fields=['domicilio']   
+        fields=['iddomicilio']   
 
 
 class PaqueteForm(ModelForm):
-    peso = forms.CharField(label="Peso", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
-    ancho = forms.CharField(label="Ancho", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
-    largo = forms.CharField(label="Largo", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
-    alto = forms.CharField(label="Alto", widget=forms.TextInput(attrs={'class': 'form-control', 'type':'number', 'placeholder': 'Solo números'}))
+    peso = forms.CharField(label="Peso", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    ancho = forms.CharField(label="Ancho", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    largo = forms.CharField(label="Largo", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    alto = forms.CharField(label="Alto", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
 
     class Meta:
         model = Paquete
-        fields = ['peso','ancho','largo','alto']
+        fields = ['peso', 'ancho', 'largo', 'alto']
+
+    def clean_peso(self):
+        peso = self.cleaned_data.get('peso')
+
+        if peso is not None:
+            try:
+                decimal_peso = float(peso)
+                return decimal_peso
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Peso.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
+        
+    def clean_ancho(self):
+        ancho = self.cleaned_data.get('ancho')
+
+        if ancho is not None:
+            try:
+                decimal_ancho = float(ancho)
+                return decimal_ancho
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Ancho.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
+        
+    def clean_largo(self):
+        largo = self.cleaned_data.get('largo')
+
+        if largo is not None:
+            try:
+                decimal_largo = float(largo)
+                return decimal_largo
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Largo.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
+        
+
+    def clean_alto(self):
+        alto = self.cleaned_data.get('alto')
+
+        if alto is not None:
+            try:
+                decimal_alto = float(alto)
+                return decimal_alto
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Alto.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
 
 
 class DomicilioForm(ModelForm):

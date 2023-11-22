@@ -16,8 +16,8 @@
     <a name="" id="" class="btn btn-primary" href="{% url 'registrar_pedido' %}" role="button" > <i class="fa-solid fa-circle-plus"></i>Nuevo Pedido</a>
 
         {% if object_list %}
-            <br><h3>Panel de Clientes</h3>
-            <br><p>Éstas son los pedidos que ha solicitado.</p><br>
+        <br><h3>Listado de Pedidos</h3>
+        <br><p>Éstos son los pedidos que ha solicitado.</p><br>
 
 
 
@@ -42,28 +42,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-
-
-
-
-            <table class="table table-responsive w-100">
-                <thead>
-                    <tr>
-                        {% for header in pedidos.headers %}
-                            <td>{{ header }}</td>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in pedidos.rows %}
-                        <tr>
-                            {% for col in row %}
-                                <td>{{ col }}</td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <br><br><br><br>
         {% else %}
             <p>Todavía no ha solicitado un pedido de envío.</p>
         {% endif %}

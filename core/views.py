@@ -105,8 +105,7 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Paquete
     form_class = PaqueteForm
     template_name = 'core/pages/nuevoPedido.html'
-    paquetes = []
-   
+    
     def test_func(self):
         return self.request.user.groups.filter(name='cliente').exists()
     
@@ -132,11 +131,25 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return render(self.request, self.template_name, context)
      
     def form_invalid(self, form):
-        submit_type = self.request.POST.get('submit_pedido') 
-        if submit_type == 'Guardar':
+        # errores=form.errors
+        paquetes = self.request.session.get('paquetes', [])
+        submit_paquete = self.request.POST.get('submit_paquete')
+        submit_pedido = self.request.POST.get('submit_pedido') 
+        del_paquete = self.request.POST.get('del_paquete') 
+        if not del_paquete == None:
+            paquetes = self.request.session.get('paquetes', [])
+            n = int(del_paquete) - 1
+            del paquetes[n]
+            # nuevo_formulario = PaqueteForm()
+            context = self.get_context_data()
+            self.request.session['paquetes'] = paquetes
+            context['paquetes'] = paquetes
+            # context['form'] = nuevo_formulario
+            return render(self.request, self.template_name, context)
+        if submit_pedido == 'Guardar':
             pedido_form = PedidoForm(self.request.POST)
             if pedido_form.is_valid():
-                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['domicilio'].id, cliente_id=self.request.user.id)
+                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['iddomicilio'].id, cliente_id=self.request.user.id)
                 pedido.save()
                 paquetes = self.request.session.get('paquetes', [])
                 for paquete_data in paquetes:
@@ -146,8 +159,34 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                 Paquete.objects.bulk_create(paquetes_objects)
                 self.request.session['paquetes'] = []
                 return redirect('clientes')
-        return self.render_to_response(self.get_context_data(form=form))
-
+        if submit_paquete == 'Guardar':
+            paquetes = self.request.session.get('paquetes', [])
+            context = self.get_context_data()
+            self.request.session['paquetes'] = paquetes
+            context['paquetes'] = paquetes
+            context['headers'] = [ 'Paquete', 'Peso', 'Ancho', 'Largo', 'Alto']
+            context['inicio'] = False
+            context['titulo'] = "Nuevo Pedido"
+            return render(self.request, self.template_name, context)
+        context = self.get_context_data()
+        self.request.session['paquetes'] = paquetes
+        context['paquetes'] = paquetes
+        form.add_error(None, 'El formulario no es válido. Se encontraron errores.')
+        context['titulo'] = "Nuevo Pedido"
+        if form.errors:
+            errores=[]
+            if not form.errors.get('peso') == None:
+                errores.append(form.errors.get('peso')[0])
+            if not form.errors.get('ancho') == None:
+                 errores.append(form.errors.get('ancho')[0])
+            if not form.errors.get('largo') == None:
+                 errores.append(form.errors.get('largo')[0])
+            if not form.errors.get('alto') == None:
+                 errores.append(form.errors.get('alto')[0]) 
+            context['errores'] = errores              
+            # return self.render_to_response(self.get_context_data(form=form))
+            # return render(self.request, self.template_name, {'form': form, 'messages': messages})
+        return render(self.request, self.template_name, context)
     def get_context_data(self, **kwargs):
         
         self.request.session['paquetes'] = []
@@ -156,6 +195,7 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         context['inicio'] = True
         context['titulo'] = "Nuevo Paquete"
         context['form'] = PaqueteForm()
+        context['headers'] = [ 'Paquete', 'Peso', 'Ancho', 'Largo', 'Alto', 'Accion']
 
         return context
 
