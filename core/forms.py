@@ -80,7 +80,7 @@ class PedidoForm(ModelForm):
                        
     class Meta:
         model = Pedido
-        fields=['iddomicilio']   
+        fields=['domicilio']   
 
 
 class PaqueteForm(ModelForm):

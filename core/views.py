@@ -149,7 +149,7 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if submit_pedido == 'Guardar':
             pedido_form = PedidoForm(self.request.POST)
             if pedido_form.is_valid():
-                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['iddomicilio'].id, cliente_id=self.request.user.id)
+                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['domicilio'].id, cliente_id=self.request.user.id)
                 pedido.save()
                 paquetes = self.request.session.get('paquetes', [])
                 for paquete_data in paquetes:
