@@ -127,6 +127,11 @@ class Postulante(Persona):
 
     def __str__(self):
         return f"{self.dni} - " + super().__str__()
+    
+    def save(self, *args, **kwargs):
+        self.username = self.dni
+        self.password = self.dni
+        super(Postulante, self).save(*args, **kwargs)
 
     def obtener_baja_url(self):
         return reverse_lazy('postulante_baja', args=[self.idpostulante])
@@ -221,6 +226,12 @@ class Empleado(models.Model):
 
     class Meta():
         verbose_name_plural = 'Empleados'
+
+def add_empleado_group(sender, instance, created, **kwargs):
+    if created:
+        instance.postulante.groups.add(Group.objects.get(name='empleado'))
+
+post_save.connect(add_empleado_group, sender=Empleado)
 
 class AsignacionPedido(models.Model):
     empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)

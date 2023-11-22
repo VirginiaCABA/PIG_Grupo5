@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import logout
 # from django.views.generic.edit import CreateView
-from .models import Postulante, Paquete, Pedido, EstadoPedido, Domicilio, Provincia, Localidad
+from .models import Postulante, Paquete, Pedido, EstadoPedido, Domicilio, Provincia, Localidad, Empleado, AsignacionPedido
 from .forms import ContactoForm, PedidoForm, ClienteForm, DomicilioForm, PaqueteForm
 from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 from django.urls import reverse
@@ -67,7 +67,7 @@ def contacto(request):
                             curriculum.read(),
                             curriculum.content_type)
                 email.send()
-                respuesta = HttpResponseRedirect("core/pages/mensaje_envio.html")
+                respuesta = HttpResponseRedirect("/core/pages/mensaje_envio.html")
         else:
             respuesta = HttpResponseBadRequest("Datos inválidos.") 
     else:
@@ -76,20 +76,6 @@ def contacto(request):
         'contacto_form' : formulario      
     }
     return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
-
-# @login_required
-# def clientes(request):
-#     '''Recibe los datos del usuario y devuelve la vista de clientes.'''
-#     pedidos = {
-#         'headers' : 
-#             [ 'Fecha pedido', 'Descripción', 'Lugar de Entrega' ],
-#         'rows' : 
-#             [
-#                 [ '2012-09-14 14:23', 'Cosa 1', 'Rivadavia 1245' ],
-#                 [ '2012-09-14 16:51', 'Cosa 2', 'San Martín 3200' ]
-#             ]
-#     }
-#     return render(request ,"core/pages/clientes.html", { 'pedidos': pedidos })
 
 
 class PedidosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -112,7 +98,7 @@ class PedidosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['headers'] = [ 'Id Pedido', 'Id Paquete', 'Fecha pedido', 'Descripción', 'Lugar de Entrega', 'Estado' ]
         # context['url_alta'] = reverse_lazy('estudiante_alta')
         return context
-
+    
 class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     login_url = '/login/'
     redirect_field_name = 'login'
@@ -206,19 +192,29 @@ class PedidoCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         return super().form_valid(form)
 
-@login_required
-def empleados(request, fecha):
+class EmpleadosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     '''Recibe los datos del usuario y devuelve la vista de empleados.'''
-    pedidos = {
-        'headers' : 
-            [ 'Fecha pedido', 'Descripción', 'Lugar de Entrega' ],
-        'rows' : 
-            [
-                [ '2012-09-14 14:23', 'Cosa 1', 'Rivadavia 1245' ],
-                [ '2012-09-14 16:51', 'Cosa 2', 'San Martín 3200' ]
-            ]
-    }
-    return render(request ,"core/pages/empleados.html", { 'fecha' : fecha, 'pedidos': pedidos })
+    login_url = '/login/'
+    redirect_field_name = 'login'
+    model = Pedido
+    template_name = 'core/pages/empleados.html'
+    ordering = ['id']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='empleado').exists()
+        
+    def get_queryset(self):
+        postulante = Postulante.objects.get(user_ptr_id=self.request.user.id)
+        empleado = Empleado.objects.filter(postulante=postulante).first()
+        queryset = Pedido.objects.filter(asignacionpedido__empleado=empleado).all()
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Pedidos"
+        context['headers'] = [ 'Id Pedido', 'Fecha pedido', 'Lugar de Entrega', 'Localidad/Provincia' ]
+        #context['fecha'] = fecha
+        return context
 
 def exit(request):
     '''Cierre la sesión y envía al home'''

@@ -14,23 +14,24 @@
 
     {% block content %}
 
-        {% if pedidos %}
+        {% if object_list %}
             <br><h3>Panel de Empleados</h3>
             <br><p>Éstas son las entregas que tiene asignadas al {{ fecha|format_date }}.</p><br>
             <table class="table table-responsive w-100">
                 <thead>
                     <tr>
-                        {% for header in pedidos.headers %}
+                        {% for header in headers %}
                             <td>{{ header }}</td>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in pedidos.rows %}
+                    {% for pedido in object_list %}
                         <tr>
-                            {% for col in row %}
-                                <td>{{ col }}</td>
-                            {% endfor %}
+                            <td>{{ pedido.idpedido }}</td>
+                            <td>{{ pedido.fecha_creacion }}</td>
+                            <td>{{ pedido.domicilio.calle }} nro: {{ pedido.domicilio.numero }} piso: {{ pedido.domicilio.piso }} dpto: {{ pedido.domicilio.departamento }}</td>
+                            <td>{{ pedido.domicilio.localidad.nombre }} / {{ pedido.domicilio.localidad.provincia.nombre }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
