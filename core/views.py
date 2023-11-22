@@ -103,7 +103,7 @@ class PedidosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return self.request.user.groups.filter(name='cliente').exists()
         
     def get_queryset(self):
-        queryset = Paquete.objects.filter(idpedido__idcliente=self.request.user.id)
+        queryset = Paquete.objects.filter(pedido__cliente=self.request.user.id)
         return queryset
     
     def get_context_data(self, **kwargs):
@@ -150,11 +150,11 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if submit_type == 'Guardar':
             pedido_form = PedidoForm(self.request.POST)
             if pedido_form.is_valid():
-                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,iddomicilio_id=pedido_form.cleaned_data['iddomicilio'].id, idcliente_id=self.request.user.id)
+                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['domicilio'].id, cliente_id=self.request.user.id)
                 pedido.save()
                 paquetes = self.request.session.get('paquetes', [])
                 for paquete_data in paquetes:
-                    paquete_data['idpedido_id'] = pedido.idpedido
+                    paquete_data['pedido_id'] = pedido.idpedido
 
                 paquetes_objects = [Paquete(**data) for data in paquetes]
                 Paquete.objects.bulk_create(paquetes_objects)

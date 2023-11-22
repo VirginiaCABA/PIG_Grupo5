@@ -32,12 +32,12 @@
                 <tbody>
                     {% for row in object_list %}
                         <tr>
-                            <td>{{ row.idpedido.idpedido }}</td>
+                            <td>{{ row.pedido.idpedido }}</td>
                             <td>{{ row.id }}</td>
-                            <td>{{ row.idpedido.fecha_creacion|date:"d/m/Y" }}</td>
+                            <td>{{ row.pedido.fecha_creacion|date:"d/m/Y" }}</td>
                             <td>Peso: {{ row.peso }} <br> Ancho: {{ row.ancho }} <br> Largo: {{ row.largo }} <br> Alto: {{ row.alto }}</td>
-                            <td>{{ row.idpedido.iddomicilio }}</td>
-                            <td>{{ row.idpedido.get_estado }}</td>
+                            <td>{{ row.pedido.domicilio }}</td>
+                            <td>{{ row.pedido.get_estado }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

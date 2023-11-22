@@ -3,6 +3,7 @@ from django.forms import ValidationError, ModelForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
 from .models import Pedido, Cliente, Domicilio, Paquete, EstadoPedido
+from django.contrib.admin import widgets
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -75,11 +76,17 @@ class ContactoForm(forms.Form):
 
 class PedidoForm(ModelForm):
     estado = forms.CharField(label="estado", initial=EstadoPedido.RECIBIDO.label, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
-    iddomicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-                       
+    domicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+
+    """ def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['domicilio'].widget = widgets.ForeignKeySelect(
+            attrs={'class': 'form-control'},
+            allow_add=True,
+        ) """
     class Meta:
         model = Pedido
-        fields=['iddomicilio']   
+        fields=['domicilio']   
 
 
 class PaqueteForm(ModelForm):
@@ -100,8 +107,6 @@ class DomicilioForm(ModelForm):
         exclude = ['baja']
 
 class ClienteForm(ModelForm):
-    #contrasenia = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
-    #confirmar_contrasenia = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
 
     def clean(self):
         if self.cleaned_data['contrasenia'] != self.cleaned_data['confirmar_contrasenia']:
