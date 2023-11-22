@@ -254,7 +254,7 @@ class EmpleadosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Pedidos"
         context['headers'] = [ 'Id Pedido', 'Fecha pedido', 'Lugar de Entrega', 'Localidad/Provincia' ]
-        #context['fecha'] = fecha
+        context['fecha'] = self.kwargs['fecha']
         return context
 
 def exit(request):
