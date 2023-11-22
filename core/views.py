@@ -67,7 +67,8 @@ def contacto(request):
                             curriculum.read(),
                             curriculum.content_type)
                 email.send()
-                respuesta = HttpResponseRedirect("/core/pages/mensaje_envio.html")
+                # respuesta = HttpResponseRedirect("/core/pages/mensaje_envio.html")
+                return redirect('contacto')
         else:
             respuesta = HttpResponseBadRequest("Datos inválidos.") 
     else:
