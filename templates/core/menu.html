@@ -19,7 +19,7 @@
         <li><a href="{% url 'contacto' %}">Contacto</a></li>
         {% if request.user.is_authenticated %}
             {% if request.user.groups.all.0.name == "cliente" %}
-                <li><a href="{% url 'clientes' %}">Clientes</a></li>
+                <li><a href="{% url 'clientes' %}">Pedidos</a></li>
             {% endif %}
             {% if request.user.groups.all.0.name == "empleado" %}
                 <li><a href="{% url 'empleados' fecha='2023-09-20' %}">Empleados</a></li>

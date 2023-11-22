@@ -18,23 +18,9 @@
 
         <section class="section">
             <div class="formulario p-1">
-                <form action='{% url "clientes" %}' method="POST" id="form">
+                <form action="" method="POST" id="form">
                     {% csrf_token %}
-                    
-                    {{ pedido_form.as_p }}
-                    {{ domicilio_formset.management_form }}
-                    {{ paquete_formset.management_form }}
-
-                    <h2>Domicilio de destino</h2>
-                    {% for form in domicilio_formset %}
-                        {{ form.as_p }}
-                    {% endfor %}
-
-                    <h2>Paquetes</h2>
-                    {% for form in paquete_formset %}
-                        {{ form.as_p }}
-                    {% endfor %}
-                    
+                    {{ form.as_p }}
                     <button type="submit">Enviar</button>
                 </form>
             </div>

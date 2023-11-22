@@ -12,4 +12,15 @@ class CustomAdmin(admin.AdminSite):
 admin_custom = CustomAdmin(name = 'LogisticaAdmin')
 
 # Register your models here.
-admin_custom.register([Provincia, Localidad, Domicilio, Sucursal, Cliente, Empleado, AsignacionPedido])
+admin_custom.register([Provincia, Localidad, Domicilio, Sucursal, Empleado])
+
+
+class ClienteAdmin(admin.ModelAdmin):
+    fields = ["username", "password", "nombre", "apellido", "mail", "cuit", "domicilio"]
+
+admin_custom.register(Cliente, ClienteAdmin)
+
+class AsignacionPedidoAdmin(admin.ModelAdmin):
+    fields = ["empleado", "pedido"]
+
+admin_custom.register(AsignacionPedido, AsignacionPedidoAdmin)

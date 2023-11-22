@@ -1,7 +1,9 @@
 from django.db import models
 from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.db.models.signals import post_save
+from django.utils import timezone
 
 # Create your models here.
 
@@ -9,6 +11,9 @@ class Provincia(models.Model):
     idprovincia = models.AutoField(primary_key=True),
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     baja = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.nombre}"
 
     def soft_delete(self):
         self.baja = True
@@ -20,9 +25,12 @@ class Provincia(models.Model):
 
 class Localidad(models.Model):
     idlocalidad = models.AutoField(primary_key=True),
-    idprovincia = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
+    provincia = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     baja = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.nombre}"
 
     def soft_delete(self):
         self.baja = True
@@ -32,9 +40,11 @@ class Localidad(models.Model):
         self.baja = False
         super().save()
 
+    class Meta():
+        verbose_name_plural = 'Localidades'
+
 class Domicilio(models.Model):
-    iddomicilio = models.AutoField(primary_key=True),
-    idlocalidad = models.ForeignKey(Provincia, on_delete=models.CASCADE)  # relacion muchos a uno
+    localidad = models.ForeignKey(Localidad, on_delete=models.CASCADE)  # relacion muchos a uno
     calle = models.CharField(max_length=150, verbose_name='Calle')
     numero = models.IntegerField(verbose_name="Número")
     piso = models.IntegerField(verbose_name="Piso")
@@ -46,7 +56,7 @@ class Domicilio(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return f"{self.calle}, {self.numero}"
+        return f"Provincia: {self.localidad.provincia.nombre}, Localidad: {self.localidad.nombre}, CP: {self.cp}, Calle: {self.calle}, Numero: {self.numero} "
     
     def soft_delete(self):
         self.baja = True
@@ -67,30 +77,20 @@ class EstadoPedido(models.TextChoices): #Estado de Pedido
     NO_ENTREGADO_VISITA1 = '5','No entregado en 1er visita'
     NO_ENTREGADO_VISITA2 = '6','No entregado en 2da visita'
 
-class Pedido(models.Model):
-    idpedido = models.AutoField(primary_key=True),
-    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
-    estado = models.CharField(max_length=3, choices=EstadoPedido.choices, default=EstadoPedido.RECIBIDO)
-
-class Paquete(models.Model):
-    idpaquete = models.AutoField(primary_key=True),
-    idpedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)  # relacion muchos a uno
-    peso = models.FloatField(verbose_name="Peso")
-    ancho = models.FloatField(verbose_name="Ancho")
-    largo = models.FloatField(verbose_name="Largo")
-    alto = models.FloatField(verbose_name="Alto")
-    objects = models.Manager()
 
 class Sucursal(models.Model):
     idsucursal =  models.AutoField(primary_key=True),
-    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+    domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     numero = models.IntegerField(verbose_name="Número")
+
+    def __str__(self):
+        return f"{self.nombre} - {self.numero}"
 
     class Meta():
         verbose_name_plural = 'Sucursales'
 
-class Persona(models.Model):
+class Persona(User):
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     apellido = models.CharField(max_length=150, verbose_name='Apellido')
     mail = models.EmailField(max_length=150, null=True)
@@ -106,6 +106,9 @@ class Persona(models.Model):
     def restore(self):
         self.baja = False
         super().save()
+
+    class Meta:
+        abstract = True
     
 class PostulanteManager(models.Manager):
 
@@ -124,6 +127,11 @@ class Postulante(Persona):
 
     def __str__(self):
         return f"{self.dni} - " + super().__str__()
+    
+    def save(self, *args, **kwargs):
+        self.username = self.dni
+        self.password = self.dni
+        super(Postulante, self).save(*args, **kwargs)
 
     def obtener_baja_url(self):
         return reverse_lazy('postulante_baja', args=[self.idpostulante])
@@ -134,46 +142,16 @@ class Postulante(Persona):
     class Meta():
         verbose_name_plural = 'Postulantes'
 
-class EmpleadoManager(models.Manager):
+""" class ClienteManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(baja=False)
-
-class Empleado(Persona):
-    idempleado = models.AutoField(primary_key=True),
-    idpostulante = models.ForeignKey(Postulante, on_delete=models.CASCADE)  # relacion muchos a uno
-    pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
-    objects = EmpleadoManager()
-
-    def __str__(self):
-        postulante = Postulante.objects.filter(idpostulante=self.idpostulante)
-        return f"{postulante.dni} - " + super().__str__()
-
-    def obtener_baja_url(self):
-        return reverse_lazy('empleado_baja', args=[self.idempleado])
-
-    def obtener_modificacion_url(self):
-        return reverse_lazy('empleado_modificacion', args=[self.idempleado])
-
-    class Meta():
-        verbose_name_plural = 'Empleados'
-
-class AsignacionPedido(models.Model):
-    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    fecha = models.DateField()
-
-class ClienteManager(models.Manager):
-
-    def get_queryset(self):
-        return super().get_queryset().filter(baja=False)
+        return super().get_queryset().filter(baja=False) """
     
 class Cliente(Persona):
     idcliente = models.AutoField(primary_key=True),
-    cuit = models.IntegerField(verbose_name="CUIT")
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    iddomicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
-    objects = ClienteManager()
+    cuit = models.BigIntegerField(verbose_name="CUIT")
+    domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+    #objects = ClienteManager()
 
     def __str__(self):
         return f"{self.cuit} - " + super().__str__()
@@ -187,3 +165,78 @@ class Cliente(Persona):
     class Meta():
         verbose_name_plural = 'Clientes'
 
+def add_cliente_group(sender, instance, created, **kwargs):
+    if created:
+        instance.groups.add(Group.objects.get(name='cliente'))
+
+post_save.connect(add_cliente_group, sender=Cliente)
+
+class Pedido(models.Model):
+    idpedido = models.AutoField(primary_key=True)
+    domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # relacion muchos a uno
+    estado = models.CharField(max_length=3, choices=EstadoPedido.choices, default=EstadoPedido.RECIBIDO)
+    fecha_creacion = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.idpedido} - {self.domicilio} - {self.fecha_creacion}"
+
+    def get_estado(self):
+        return dict(EstadoPedido.choices)[self.estado]
+
+
+class Paquete(models.Model):
+    idpaquete = models.AutoField(primary_key=True),
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)  # relacion muchos a uno
+    peso = models.FloatField(verbose_name="Peso")
+    ancho = models.FloatField(verbose_name="Ancho")
+    largo = models.FloatField(verbose_name="Largo")
+    alto = models.FloatField(verbose_name="Alto")
+    objects = models.Manager()
+
+    def to_dict(self):
+        return {
+            'peso': str(self.peso),
+            'ancho': str(self.ancho),
+            'largo': str(self.largo),
+            'alto': str(self.alto),
+        }
+
+
+""" class EmpleadoManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(baja=False) """
+    
+class Empleado(models.Model):
+    idempleado = models.AutoField(primary_key=True),
+    postulante = models.OneToOneField(Postulante, on_delete=models.CASCADE, unique=False)
+    pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
+    #baja = models.BooleanField(default=False)
+    #objects = EmpleadoManager()
+
+    def __str__(self):
+        return f"{self.postulante.__str__()}"
+
+    def obtener_baja_url(self):
+        return reverse_lazy('empleado_baja', args=[self.idempleado])
+
+    def obtener_modificacion_url(self):
+        return reverse_lazy('empleado_modificacion', args=[self.idempleado])
+
+    class Meta():
+        verbose_name_plural = 'Empleados'
+
+def add_empleado_group(sender, instance, created, **kwargs):
+    if created:
+        instance.postulante.groups.add(Group.objects.get(name='empleado'))
+
+post_save.connect(add_empleado_group, sender=Empleado)
+
+class AsignacionPedido(models.Model):
+    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    fecha = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.empleado.__str__()} - {self.pedido.__str__()}"

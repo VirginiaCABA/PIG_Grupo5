@@ -3,11 +3,19 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import logout
-from django.views.generic.edit import CreateView
-from .models import Postulante
-from .forms import ContactoForm, PedidoForm, ClienteForm, DomicilioForm
+# from django.views.generic.edit import CreateView
+from .models import Postulante, Paquete, Pedido, EstadoPedido, Domicilio, Provincia, Localidad, Empleado, AsignacionPedido
+from .forms import ContactoForm, PedidoForm, ClienteForm, DomicilioForm, PaqueteForm
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView
+from django.urls import reverse
+from django.shortcuts import render
+
+
+
+def admin(request):
+    return redirect('admin')
 
 # Create your views here.
 def home(request):
@@ -59,7 +67,8 @@ def contacto(request):
                             curriculum.read(),
                             curriculum.content_type)
                 email.send()
-                respuesta = HttpResponseRedirect("core/pages/mensaje_envio.html")
+                # respuesta = HttpResponseRedirect("/core/pages/mensaje_envio.html")
+                return redirect('contacto')
         else:
             respuesta = HttpResponseBadRequest("Datos inválidos.") 
     else:
@@ -69,39 +78,151 @@ def contacto(request):
     }
     return render(request ,"core/pages/contacto.html" , context) if respuesta is None else respuesta
 
-@login_required
-def clientes(request):
-    '''Recibe los datos del usuario y devuelve la vista de clientes.'''
-    pedidos = {
-        'headers' : 
-            [ 'Fecha pedido', 'Descripción', 'Lugar de Entrega' ],
-        'rows' : 
-            [
-                [ '2012-09-14 14:23', 'Cosa 1', 'Rivadavia 1245' ],
-                [ '2012-09-14 16:51', 'Cosa 2', 'San Martín 3200' ]
-            ]
-    }
-    return render(request ,"core/pages/clientes.html", { 'pedidos': pedidos })
+
+class PedidosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = '/login/'
+    redirect_field_name = 'login'
+    model = Paquete
+    template_name = 'core/pages/clientes.html'
+    ordering = ['id']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='cliente').exists()
+        
+    def get_queryset(self):
+        queryset = Paquete.objects.filter(pedido__cliente=self.request.user.id)
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Pedidos"
+        context['headers'] = [ 'Id Pedido', 'Id Paquete', 'Fecha pedido', 'Descripción', 'Lugar de Entrega', 'Estado' ]
+        # context['url_alta'] = reverse_lazy('estudiante_alta')
+        return context
+    
+class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    login_url = '/login/'
+    redirect_field_name = 'login'
+    model = Paquete
+    form_class = PaqueteForm
+    template_name = 'core/pages/nuevoPedido.html'
+    
+    def test_func(self):
+        return self.request.user.groups.filter(name='cliente').exists()
+    
+    def form_valid(self, form):
+        submit_type = self.request.POST.get('submit_pedido') 
+        submit_type = self.request.POST.get('submit_type')
+        paquete = form.save(commit=False)
+        paquetes = self.request.session.get('paquetes', [])
+        paquetes.append(paquete.to_dict())
+        if submit_type == 'Guardar':
+            context = self.get_context_data()
+            self.request.session['paquetes'] = paquetes
+            context['paquetes'] = paquetes
+            context['inicio'] = False
+            context['titulo'] = "Nuevo Pedido"
+            return render(self.request, self.template_name, context)
+        else:
+            nuevo_formulario = PaqueteForm()
+            context = self.get_context_data()
+            self.request.session['paquetes'] = paquetes
+            context['paquetes'] = paquetes
+            context['form'] = nuevo_formulario
+        return render(self.request, self.template_name, context)
+     
+    def form_invalid(self, form):
+        # errores=form.errors
+        paquetes = self.request.session.get('paquetes', [])
+        submit_paquete = self.request.POST.get('submit_paquete')
+        submit_pedido = self.request.POST.get('submit_pedido') 
+        del_paquete = self.request.POST.get('del_paquete') 
+        if not del_paquete == None:
+            paquetes = self.request.session.get('paquetes', [])
+            n = int(del_paquete) - 1
+            del paquetes[n]
+            # nuevo_formulario = PaqueteForm()
+            context = self.get_context_data()
+            self.request.session['paquetes'] = paquetes
+            context['paquetes'] = paquetes
+            # context['form'] = nuevo_formulario
+            return render(self.request, self.template_name, context)
+        if submit_pedido == 'Guardar':
+            pedido_form = PedidoForm(self.request.POST)
+            if pedido_form.is_valid():
+                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['domicilio'].id, cliente_id=self.request.user.id)
+                pedido.save()
+                paquetes = self.request.session.get('paquetes', [])
+                for paquete_data in paquetes:
+                    paquete_data['pedido_id'] = pedido.idpedido
+
+                paquetes_objects = [Paquete(**data) for data in paquetes]
+                Paquete.objects.bulk_create(paquetes_objects)
+                self.request.session['paquetes'] = []
+                return redirect('clientes')
+        if submit_paquete == 'Guardar':
+            paquetes = self.request.session.get('paquetes', [])
+            context = self.get_context_data()
+            self.request.session['paquetes'] = paquetes
+            context['paquetes'] = paquetes
+            context['headers'] = [ 'Paquete', 'Peso', 'Ancho', 'Largo', 'Alto']
+            context['inicio'] = False
+            context['titulo'] = "Nuevo Pedido"
+            return render(self.request, self.template_name, context)
+        context = self.get_context_data()
+        self.request.session['paquetes'] = paquetes
+        context['paquetes'] = paquetes
+        form.add_error(None, 'El formulario no es válido. Se encontraron errores.')
+        context['titulo'] = "Nuevo Pedido"
+        if form.errors:
+            errores=[]
+            if not form.errors.get('peso') == None:
+                errores.append(form.errors.get('peso')[0])
+            if not form.errors.get('ancho') == None:
+                 errores.append(form.errors.get('ancho')[0])
+            if not form.errors.get('largo') == None:
+                 errores.append(form.errors.get('largo')[0])
+            if not form.errors.get('alto') == None:
+                 errores.append(form.errors.get('alto')[0]) 
+            context['errores'] = errores              
+            # return self.render_to_response(self.get_context_data(form=form))
+            # return render(self.request, self.template_name, {'form': form, 'messages': messages})
+        return render(self.request, self.template_name, context)
+    def get_context_data(self, **kwargs):
+        
+        self.request.session['paquetes'] = []
+        context = super().get_context_data(**kwargs)
+        context['pedido_form'] = PedidoForm() 
+        context['inicio'] = True
+        context['titulo'] = "Nuevo Paquete"
+        context['form'] = PaqueteForm()
+        context['headers'] = [ 'Paquete', 'Peso', 'Ancho', 'Largo', 'Alto', 'Accion']
+
+        return context
 
 
+class DomicilioCreateView(CreateView):
+    '''Devuelve el formulario de registro del nuevo domicilio'''
+    template_name = 'core/pages/registrar_cliente.html'
+    form_class = DomicilioForm
+    success_url = '/registrar_cliente/'
+
+    def post(self, request, *args, **kwargs):
+        domicilio = self.form_class(request.POST)
+        if domicilio.is_valid():
+            domicilio.save()
+        return redirect(self.request.path) 
 class ClienteCreateView(CreateView):
     '''Devuelve el formulario de registro del nuevo cliente'''
     template_name = 'core/pages/registrar_cliente.html'
     form_class = ClienteForm
-    second_form_class = DomicilioForm
     success_url = '/login/'
 
     def post(self, request, *args, **kwargs):
         cliente = self.form_class(request.POST)
-        domicilio = self.second_form_class(request.POST, prefix='domicilio')
-        
-        if domicilio.is_valid():
-            domicilio = domicilio.save(commit=False)
-            domicilio.save()
-            if cliente.is_valid():
-                cliente.domicilio = domicilio
-                cliente.save()
-            return redirect(self.request.path)
+        if cliente.is_valid():
+            cliente.save()
+        return redirect(self.request.path)
 
 class PedidoCreateView(LoginRequiredMixin, CreateView):
     '''Devuelve el formulario de solicitud de envío'''
@@ -112,19 +233,29 @@ class PedidoCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         return super().form_valid(form)
 
-@login_required
-def empleados(request, fecha):
+class EmpleadosView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     '''Recibe los datos del usuario y devuelve la vista de empleados.'''
-    pedidos = {
-        'headers' : 
-            [ 'Fecha pedido', 'Descripción', 'Lugar de Entrega' ],
-        'rows' : 
-            [
-                [ '2012-09-14 14:23', 'Cosa 1', 'Rivadavia 1245' ],
-                [ '2012-09-14 16:51', 'Cosa 2', 'San Martín 3200' ]
-            ]
-    }
-    return render(request ,"core/pages/empleados.html", { 'fecha' : fecha, 'pedidos': pedidos })
+    login_url = '/login/'
+    redirect_field_name = 'login'
+    model = Pedido
+    template_name = 'core/pages/empleados.html'
+    ordering = ['id']
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='empleado').exists()
+        
+    def get_queryset(self):
+        postulante = Postulante.objects.get(user_ptr_id=self.request.user.id)
+        empleado = Empleado.objects.filter(postulante=postulante).first()
+        queryset = Pedido.objects.filter(asignacionpedido__empleado=empleado).all()
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Pedidos"
+        context['headers'] = [ 'Id Pedido', 'Fecha pedido', 'Lugar de Entrega', 'Localidad/Provincia' ]
+        #context['fecha'] = fecha
+        return context
 
 def exit(request):
     '''Cierre la sesión y envía al home'''

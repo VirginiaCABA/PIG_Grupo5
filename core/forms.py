@@ -2,7 +2,8 @@ from django import forms
 from django.forms import ValidationError, ModelForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
-from .models import Pedido, Cliente, Domicilio
+from .models import Pedido, Cliente, Domicilio, Paquete, EstadoPedido
+from django.contrib.admin import widgets
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -74,24 +75,81 @@ class ContactoForm(forms.Form):
     )
 
 class PedidoForm(ModelForm):
-    """Crea el formulario de pedidos"""
+    estado = forms.CharField(label="estado", initial=EstadoPedido.RECIBIDO.label, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
+    iddomicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+                       
     class Meta:
         model = Pedido
-        fields = '__all__'
+        fields=['domicilio']   
 
-class UserForm(ModelForm):
+
+class PaqueteForm(ModelForm):
+    peso = forms.CharField(label="Peso", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    ancho = forms.CharField(label="Ancho", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    largo = forms.CharField(label="Largo", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    alto = forms.CharField(label="Alto", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+
     class Meta:
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password']
+        model = Paquete
+        fields = ['peso', 'ancho', 'largo', 'alto']
+
+    def clean_peso(self):
+        peso = self.cleaned_data.get('peso')
+
+        if peso is not None:
+            try:
+                decimal_peso = float(peso)
+                return decimal_peso
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Peso.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
+        
+    def clean_ancho(self):
+        ancho = self.cleaned_data.get('ancho')
+
+        if ancho is not None:
+            try:
+                decimal_ancho = float(ancho)
+                return decimal_ancho
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Ancho.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
+        
+    def clean_largo(self):
+        largo = self.cleaned_data.get('largo')
+
+        if largo is not None:
+            try:
+                decimal_largo = float(largo)
+                return decimal_largo
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Largo.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
+        
+
+    def clean_alto(self):
+        alto = self.cleaned_data.get('alto')
+
+        if alto is not None:
+            try:
+                decimal_alto = float(alto)
+                return decimal_alto
+            except ValueError:
+                raise forms.ValidationError('Ingrese un valor numérico válido en el campo Alto.')
+        else:
+            raise forms.ValidationError('Este campo es requerido.')
+
 
 class DomicilioForm(ModelForm):
     class Meta:
         model = Domicilio
         fields = '__all__'
+        exclude = ['baja']
 
 class ClienteForm(ModelForm):
-    contrasenia = forms.CharField(label='Contraseña',widget=forms.PasswordInput, min_length=6)
-    confirmar_contrasenia = forms.CharField(label='Confirmar contraseña',widget=forms.PasswordInput, min_length=6)
 
     def clean(self):
         if self.cleaned_data['contrasenia'] != self.cleaned_data['confirmar_contrasenia']:
@@ -102,6 +160,7 @@ class ClienteForm(ModelForm):
         if User.objects.filter(username=self.cleaned_data['mail']).exists():
             raise ValidationError("El cliente ya está registrado")
         return self.cleaned_data['mail']
+    
     class Meta:
         model = Cliente
-        fields = ['nombre', 'apellido', 'cuit', 'mail']
+        fields = ['username','password','nombre', 'apellido', 'cuit', 'mail', 'domicilio']

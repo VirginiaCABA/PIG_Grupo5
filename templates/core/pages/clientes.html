@@ -13,28 +13,36 @@
     {% endblock %}
 
     {% block content %}
+    <a name="" id="" class="btn btn-primary" href="{% url 'registrar_pedido' %}" role="button" > <i class="fa-solid fa-circle-plus"></i>Nuevo Pedido</a>
 
-        {% if pedidos %}
-            <br><h3>Panel de Clientes</h3>
-            <br><p>Éstas son los pedidos que ha solicitado.</p><br>
+        {% if object_list %}
+        <br><h3>Listado de Pedidos</h3>
+        <br><p>Éstos son los pedidos que ha solicitado.</p><br>
+
+
+
             <table class="table table-responsive w-100">
                 <thead>
                     <tr>
-                        {% for header in pedidos.headers %}
+                        {% for header in headers %}
                             <td>{{ header }}</td>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in pedidos.rows %}
+                    {% for row in object_list %}
                         <tr>
-                            {% for col in row %}
-                                <td>{{ col }}</td>
-                            {% endfor %}
+                            <td>{{ row.pedido.idpedido }}</td>
+                            <td>{{ row.id }}</td>
+                            <td>{{ row.pedido.fecha_creacion|date:"d/m/Y" }}</td>
+                            <td>Peso: {{ row.peso }} <br> Ancho: {{ row.ancho }} <br> Largo: {{ row.largo }} <br> Alto: {{ row.alto }}</td>
+                            <td>{{ row.pedido.domicilio }}</td>
+                            <td>{{ row.pedido.get_estado }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            <br><br><br><br>
         {% else %}
             <p>Todavía no ha solicitado un pedido de envío.</p>
         {% endif %}
