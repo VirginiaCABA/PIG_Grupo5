@@ -3,7 +3,6 @@ from django.forms import ValidationError, ModelForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
 from .models import Pedido, Cliente, Domicilio, Paquete, EstadoPedido
-from django.contrib.admin import widgets
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -142,19 +141,9 @@ class PaqueteForm(ModelForm):
         else:
             raise forms.ValidationError('Este campo es requerido.')
 
-
-class DomicilioForm(ModelForm):
-    class Meta:
-        model = Domicilio
-        fields = '__all__'
-        exclude = ['baja']
-
 class ClienteForm(ModelForm):
 
-    def clean(self):
-        if self.cleaned_data['contrasenia'] != self.cleaned_data['confirmar_contrasenia']:
-            raise ValidationError("La contraseñas no coinciden")
-        return self.cleaned_data
+    password = forms.CharField(widget=forms.PasswordInput)
 
     def clean_mail(self):
         if User.objects.filter(username=self.cleaned_data['mail']).exists():
@@ -163,4 +152,4 @@ class ClienteForm(ModelForm):
     
     class Meta:
         model = Cliente
-        fields = ['username','password','nombre', 'apellido', 'cuit', 'mail', 'domicilio']
+        fields = ['mail', 'password', 'nombre', 'apellido', 'cuit', 'domicilio']

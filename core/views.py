@@ -1,17 +1,15 @@
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import logout
-# from django.views.generic.edit import CreateView
-from .models import Postulante, Paquete, Pedido, EstadoPedido, Domicilio, Provincia, Localidad, Empleado, AsignacionPedido
-from .forms import ContactoForm, PedidoForm, ClienteForm, DomicilioForm, PaqueteForm
-from django.views.generic import ListView, CreateView, DeleteView, UpdateView
-from django.urls import reverse
+from .models import Postulante, Paquete, Pedido, EstadoPedido, Empleado
+from .forms import ContactoForm, PedidoForm, ClienteForm, PaqueteForm
+from django.views.generic import ListView, CreateView
+#from django.urls import reverse
 from django.shortcuts import render
-
 
 
 def admin(request):
@@ -200,29 +198,17 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
         return context
 
-
-class DomicilioCreateView(CreateView):
-    '''Devuelve el formulario de registro del nuevo domicilio'''
-    template_name = 'core/pages/registrar_cliente.html'
-    form_class = DomicilioForm
-    success_url = '/registrar_cliente/'
-
-    def post(self, request, *args, **kwargs):
-        domicilio = self.form_class(request.POST)
-        if domicilio.is_valid():
-            domicilio.save()
-        return redirect(self.request.path) 
+    
 class ClienteCreateView(CreateView):
     '''Devuelve el formulario de registro del nuevo cliente'''
     template_name = 'core/pages/registrar_cliente.html'
     form_class = ClienteForm
-    success_url = '/login/'
 
     def post(self, request, *args, **kwargs):
         cliente = self.form_class(request.POST)
         if cliente.is_valid():
             cliente.save()
-        return redirect(self.request.path)
+        return redirect('login')
 
 class PedidoCreateView(LoginRequiredMixin, CreateView):
     '''Devuelve el formulario de solicitud de envío'''

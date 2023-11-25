@@ -160,6 +160,10 @@ class Cliente(Persona):
 
     def __str__(self):
         return f"{self.cuit} - " + super().__str__()
+    
+    def save(self, *args, **kwargs):
+        self.username = self.mail
+        super(Cliente, self).save(*args, **kwargs)
 
     def obtener_baja_url(self):
         return reverse_lazy('cliente_baja', args=[self.idcliente])
