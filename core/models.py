@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.hashers import make_password
 from django.db.models.signals import post_save
 from django.utils import timezone
 
@@ -98,6 +99,10 @@ class Persona(User):
     
     def __str__(self):
         return f"{self.apellido}, {self.nombre}"
+    
+    def save(self, *args, **kwargs):
+        self.password = make_password(self.password)
+        super(Persona, self).save(*args, **kwargs)
 
     def soft_delete(self):
         self.baja = True

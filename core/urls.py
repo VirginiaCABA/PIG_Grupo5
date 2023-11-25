@@ -22,7 +22,6 @@ from core.views import *
 urlpatterns = [
     path('', home, name='home'),
     path('administracion/', admin_custom.urls),
-    #path('administracion/', admin.site.urls, name='admin'),
     path('nosotros/', nosotros, name='nosotros'),
     path('servicios/', servicios, name='servicios'),
     path('contacto/', contacto, name='contacto'),
