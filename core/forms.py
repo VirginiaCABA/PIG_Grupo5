@@ -75,11 +75,21 @@ class ContactoForm(forms.Form):
 
 class PedidoForm(ModelForm):
     estado = forms.CharField(label="estado", initial=EstadoPedido.RECIBIDO.label, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
-    iddomicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-                       
+    # domicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+    provincia = forms.CharField(label='Provincia', max_length=150, required=True,  widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    localidad = forms.CharField(label='Localidad', max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    calle = forms.CharField(label='Calle', max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    numero = forms.CharField(label="Numero", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    piso = forms.CharField(label="Piso", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    departamento = forms.CharField(label='Departamento', max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    cp = forms.CharField(label="cp", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    latitud = forms.CharField(label="latitud", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    longitud = forms.CharField(label="longitud", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+
+
     class Meta:
         model = Pedido
-        fields=['domicilio']   
+        fields=['provincia','localidad','calle','numero','piso','departamento','cp','latitud','longitud']   
 
 
 class PaqueteForm(ModelForm):

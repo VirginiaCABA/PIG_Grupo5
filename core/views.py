@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 #from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import logout
-from .models import Postulante, Paquete, Pedido, EstadoPedido, Empleado
+from .models import Postulante, Paquete, Pedido, EstadoPedido, Empleado, Localidad, Provincia, Domicilio
 from .forms import ContactoForm, PedidoForm, ClienteForm, PaqueteForm
 from django.views.generic import ListView, CreateView
 #from django.urls import reverse
@@ -148,7 +148,50 @@ class PedidosCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if submit_pedido == 'Guardar':
             pedido_form = PedidoForm(self.request.POST)
             if pedido_form.is_valid():
-                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['domicilio'].id, cliente_id=self.request.user.id)
+                if Provincia.objects.filter(nombre__icontains=pedido_form.cleaned_data['provincia']).exists():
+                    provincia_id= Provincia.objects.filter(nombre__icontains=pedido_form.cleaned_data['provincia'])[0].id
+                else:
+                    provincia=Provincia(nombre=pedido_form.cleaned_data['provincia'],baja=False)
+                    provincia.save()
+                    provincia_id = provincia.id
+
+                if Localidad.objects.filter(nombre__icontains=pedido_form.cleaned_data['localidad'], provincia_id=provincia_id ).exists():
+                    localidad_id= Localidad.objects.filter(nombre__icontains=pedido_form.cleaned_data['localidad'], provincia_id=provincia_id)[0].id
+                else:
+                    localidad=Localidad(nombre=pedido_form.cleaned_data['localidad'],baja=False,provincia_id=provincia_id)
+                    localidad.save()
+                    localidad_id = localidad.id
+
+                if Domicilio.objects.filter(calle__icontains=pedido_form.cleaned_data['calle'],
+                                            numero__icontains=pedido_form.cleaned_data['numero'],
+                                            piso__icontains=pedido_form.cleaned_data['piso'],
+                                            departamento__icontains=pedido_form.cleaned_data['departamento'],
+                                            cp__icontains=pedido_form.cleaned_data['cp'],
+                                            latitud__icontains=pedido_form.cleaned_data['latitud'],
+                                            longitud__icontains=pedido_form.cleaned_data['longitud'],
+                                            localidad_id=localidad_id).exists():
+                    domicilio_id= Domicilio.objects.filter(calle__icontains=pedido_form.cleaned_data['calle'],
+                                                           numero__icontains=pedido_form.cleaned_data['numero'],
+                                                           piso__icontains=pedido_form.cleaned_data['piso'],
+                                                           departamento__icontains=pedido_form.cleaned_data['departamento'],
+                                                           cp__icontains=pedido_form.cleaned_data['cp'],
+                                                           latitud__icontains=pedido_form.cleaned_data['latitud'],
+                                                           longitud__icontains=pedido_form.cleaned_data['longitud'],
+                                                           localidad_id=localidad_id)[0].id
+                else:
+                    domicilio=Domicilio(calle=pedido_form.cleaned_data['calle'],
+                                        numero=pedido_form.cleaned_data['numero'],
+                                        piso=pedido_form.cleaned_data['piso'],
+                                        departamento=pedido_form.cleaned_data['departamento'],
+                                        cp=pedido_form.cleaned_data['cp'],
+                                        latitud=pedido_form.cleaned_data['latitud'],
+                                        longitud=pedido_form.cleaned_data['longitud'],
+                                        baja=False,
+                                        localidad_id=localidad_id)
+                    domicilio.save()
+                    domicilio_id = domicilio.id   
+                # pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=pedido_form.cleaned_data['domicilio'].id, cliente_id=self.request.user.id)
+                pedido = Pedido(estado=EstadoPedido.RECIBIDO.value,domicilio_id=domicilio_id, cliente_id=self.request.user.id)
                 pedido.save()
                 paquetes = self.request.session.get('paquetes', [])
                 for paquete_data in paquetes:
