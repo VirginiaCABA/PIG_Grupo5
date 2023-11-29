@@ -22,14 +22,13 @@ from core.views import *
 urlpatterns = [
     path('', home, name='home'),
     path('administracion/', admin_custom.urls),
-    #path('administracion/', admin.site.urls, name='admin'),
     path('nosotros/', nosotros, name='nosotros'),
     path('servicios/', servicios, name='servicios'),
     path('contacto/', contacto, name='contacto'),
     path('clientes/', PedidosView.as_view(), name='clientes'),
-    path('registrar_pedido/', PedidosCreateView.as_view(), name='registrar_pedido'),
     path('registrar_domicilio/', DomicilioCreateView.as_view(), name='registrar_domicilio'),
-    path('registrar_cliente/', ClienteCreateView.as_view(), name='registrar_cliente'),
+    path('registrar_cliente/<domicilio>', ClienteCreateView.as_view(), name='registrar_cliente'),
+    path('registrar_pedido/', PedidosCreateView.as_view(), name='registrar_pedido'),
     re_path(r'^empleados/(?P<fecha>\d{4}-\d{2}-\d{2})/$', EmpleadosView.as_view(), name='empleados'),
     path('logout/', exit, name='exit'),
 ]

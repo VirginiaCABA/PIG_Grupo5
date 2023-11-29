@@ -4,17 +4,24 @@
 
 {% block links %} 
     <link rel="stylesheet" href="{% static 'core/styles/cliente.css' %}"> 
-    <script src="{% static 'core/js/login.js' %}"></script>
 {% endblock %} 
 
 {% block content %}
 
     <div class="container">
         <form action="" method="post" class="login-form">
-            <h2>Registrarse</h2>
             {% csrf_token %}
-            {{form.as_p}}
-            <button type="submit">Continuar</button>
+            <h2>Ya registramos tu domicilio...</h2>
+            {{form.domicilio}}
+            <h2>Ahora necesitamos los siguientes datos personales</h2>
+            <label for="">{{ form.first_name.label }}</label>{{form.first_name}}
+            <label for="">{{ form.last_name.label }}</label>{{form.last_name}}
+            <label for="">{{ form.cuit.label }}</label>{{form.cuit}}
+            <h2>¡Listo! Ingresá tu mail y una contraseña segura</h2>
+            <label for="">{{ form.email.label }}</label>{{form.email}}
+            <label for="">{{ form.password.label }}</label>{{form.password}}
+            <h2>Clickeá en el botón de abajo y ¡FIN!</h2>
+            <button type="submit">Guardar</button>
         </form>
     </div>
 

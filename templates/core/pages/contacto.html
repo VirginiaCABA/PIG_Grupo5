@@ -19,19 +19,19 @@
             <form id="form" method="POST" action='{% url "contacto" %}' enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-column">
-                    <label for="{{ contacto_form.nombre.id_for_label }}">{{ contacto_form.nombre.name }}</label>
-                    {{ contacto_form.nombre }}
-                    <label for="{{ contacto_form.apellido.id_for_label }}">{{ contacto_form.apellido.name }}</label>
-                    {{ contacto_form.apellido }}
-                    <label for="{{ contacto_form.dni.id_for_label }}">{{ contacto_form.dni.name }}</label>
+                    <label for="">{{ contacto_form.first_name.label }}</label>
+                    {{ contacto_form.first_name }}
+                    <label for="">{{ contacto_form.last_name.label }}</label>
+                    {{ contacto_form.last_name }}
+                    <label for="">{{ contacto_form.dni.label }}</label>
                     {{ contacto_form.dni }}
-                    <label for="{{ contacto_form.mail.id_for_label }}">{{ contacto_form.mail.name }}</label>
-                    {{ contacto_form.mail }}
+                    <label for="">{{ contacto_form.email.label }}</label>
+                    {{ contacto_form.email }}
                 </div>
                 <div class="form-column">
-                    <label for="{{ contacto_form.curriculum.id_for_label }}">{{ contacto_form.curriculum.name }}</label>
+                    <label for="">{{ contacto_form.curriculum.label }}</label>
                     {{ contacto_form.curriculum }}
-                    <label for="{{ contacto_form.mensaje.id_for_label }}">{{ contacto_form.mensaje.name }}</label>
+                    <label for="">{{ contacto_form.mensaje.label }}</label>
                     {{ contacto_form.mensaje }}
                 </div>
                 <button id="btn" class="form-button" type="submit">Enviar</button>

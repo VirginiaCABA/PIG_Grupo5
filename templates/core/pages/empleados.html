@@ -29,7 +29,7 @@
                     {% for pedido in object_list %}
                         <tr>
                             <td>{{ pedido.idpedido }}</td>
-                            <td>{{ pedido.fecha_creacion }}</td>
+                            <td>{{ pedido.fecha_creacion|date:"d/m/Y" }}</td>
                             <td>{{ pedido.domicilio.calle }} nro: {{ pedido.domicilio.numero }} piso: {{ pedido.domicilio.piso }} dpto: {{ pedido.domicilio.departamento }}</td>
                             <td>{{ pedido.domicilio.localidad.nombre }} / {{ pedido.domicilio.localidad.provincia.nombre }}</td>
                         </tr>

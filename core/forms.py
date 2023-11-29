@@ -3,7 +3,6 @@ from django.forms import ValidationError, ModelForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
 from .models import Pedido, Cliente, Domicilio, Paquete, EstadoPedido
-from django.contrib.admin import widgets
 
 def sin_espacios(value):
     '''Remueve espacios al str que recibe "value"
@@ -31,7 +30,7 @@ def validar_mail(value):
 
 class ContactoForm(forms.Form):
     """Devuelve el formulario de contactos"""
-    nombre = forms.CharField(
+    first_name = forms.CharField(
         label='Nombre',
         max_length=50,
         required=True,
@@ -39,7 +38,7 @@ class ContactoForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control',
                                       'placeholder': 'Solo letras'})
     )
-    apellido = forms.CharField(
+    last_name = forms.CharField(
         label='Apellido',
         max_length=50,
         required=True,
@@ -56,7 +55,7 @@ class ContactoForm(forms.Form):
                                        'type':'number',
                                        'placeholder': 'Solo números'})
     )
-    mail = forms.EmailField(
+    email = forms.EmailField(
         label='Email',
         max_length=100,
         required=True,
@@ -76,11 +75,18 @@ class ContactoForm(forms.Form):
 
 class PedidoForm(ModelForm):
     estado = forms.CharField(label="estado", initial=EstadoPedido.RECIBIDO.label, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
-    iddomicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-                       
+    # domicilio = forms.ModelChoiceField(label="domicilio", queryset=Domicilio.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+    provincia = forms.CharField(label='Provincia', max_length=150, required=True,  widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    localidad = forms.CharField(label='Localidad', max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    calle = forms.CharField(label='Calle', max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    numero = forms.CharField(label="Numero", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    piso = forms.CharField(label="Piso", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+    departamento = forms.CharField(label='Departamento', max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
+    cp = forms.CharField(label="cp", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
+
     class Meta:
         model = Pedido
-        fields=['domicilio']   
+        fields=['provincia','localidad','calle','numero','piso','departamento','cp']   
 
 
 class PaqueteForm(ModelForm):
@@ -144,23 +150,22 @@ class PaqueteForm(ModelForm):
 
 
 class DomicilioForm(ModelForm):
+
     class Meta:
         model = Domicilio
-        fields = '__all__'
+        fields = ['calle', 'numero', 'piso', 'departamento', 'localidad', 'cp']
         exclude = ['baja']
-
+        
 class ClienteForm(ModelForm):
 
-    def clean(self):
-        if self.cleaned_data['contrasenia'] != self.cleaned_data['confirmar_contrasenia']:
-            raise ValidationError("La contraseñas no coinciden")
-        return self.cleaned_data
+    password = forms.CharField(widget=forms.PasswordInput)
 
-    def clean_mail(self):
-        if User.objects.filter(username=self.cleaned_data['mail']).exists():
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
             raise ValidationError("El cliente ya está registrado")
-        return self.cleaned_data['mail']
+        return email
     
     class Meta:
         model = Cliente
-        fields = ['username','password','nombre', 'apellido', 'cuit', 'mail', 'domicilio']
+        fields = ['email', 'password', 'first_name', 'last_name', 'cuit', 'domicilio']

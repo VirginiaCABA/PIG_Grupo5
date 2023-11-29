@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.hashers import make_password
 from django.db.models.signals import post_save
 from django.utils import timezone
 
@@ -50,8 +51,8 @@ class Domicilio(models.Model):
     piso = models.IntegerField(verbose_name="Piso")
     departamento = models.CharField(max_length=150, verbose_name='Dpto')
     cp = models.IntegerField(verbose_name="Código Postal")
-    latitud = models.FloatField(verbose_name="Latitud")
-    longitud = models.FloatField(verbose_name="Longitud")
+    latitud = models.FloatField(verbose_name="Latitud", null=True)
+    longitud = models.FloatField(verbose_name="Longitud", null=True)
     baja = models.BooleanField(default=False)
     objects = models.Manager()
 
@@ -83,6 +84,7 @@ class Sucursal(models.Model):
     domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
     nombre = models.CharField(max_length=100, verbose_name='Nombre')
     numero = models.IntegerField(verbose_name="Número")
+    baja = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombre} - {self.numero}"
@@ -91,13 +93,15 @@ class Sucursal(models.Model):
         verbose_name_plural = 'Sucursales'
 
 class Persona(User):
-    nombre = models.CharField(max_length=100, verbose_name='Nombre')
-    apellido = models.CharField(max_length=150, verbose_name='Apellido')
-    mail = models.EmailField(max_length=150, null=True)
+    '''Clase abstracta para heredar atributos de User'''
     baja = models.BooleanField(default=False)
     
     def __str__(self):
-        return f"{self.apellido}, {self.nombre}"
+        return f"{self.last_name}, {self.first_name}"
+    
+    def save(self, *args, **kwargs):
+        self.password = make_password(self.password)
+        super(Persona, self).save(*args, **kwargs)
 
     def soft_delete(self):
         self.baja = True
@@ -142,19 +146,26 @@ class Postulante(Persona):
     class Meta():
         verbose_name_plural = 'Postulantes'
 
-""" class ClienteManager(models.Manager):
-
+class ClienteManager(models.Manager):
+    
+    def normalize_email(self, email):
+        return email
+    
     def get_queryset(self):
-        return super().get_queryset().filter(baja=False) """
+        return super().get_queryset().filter(baja=False)
     
 class Cliente(Persona):
     idcliente = models.AutoField(primary_key=True),
     cuit = models.BigIntegerField(verbose_name="CUIT")
     domicilio = models.ForeignKey(Domicilio, on_delete=models.CASCADE)  # relacion muchos a uno
-    #objects = ClienteManager()
+    objects = ClienteManager()
 
     def __str__(self):
         return f"{self.cuit} - " + super().__str__()
+    
+    def save(self, *args, **kwargs):
+        self.username = self.email
+        super(Cliente, self).save(*args, **kwargs)
 
     def obtener_baja_url(self):
         return reverse_lazy('cliente_baja', args=[self.idcliente])
@@ -203,17 +214,17 @@ class Paquete(models.Model):
         }
 
 
-""" class EmpleadoManager(models.Manager):
+class EmpleadoManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(baja=False) """
+        return super().get_queryset().filter(baja=False)
     
 class Empleado(models.Model):
     idempleado = models.AutoField(primary_key=True),
     postulante = models.OneToOneField(Postulante, on_delete=models.CASCADE, unique=False)
     pedidos = models.ManyToManyField(Pedido, through='AsignacionPedido') # relacion muchos a muchos
-    #baja = models.BooleanField(default=False)
-    #objects = EmpleadoManager()
+    baja = models.BooleanField(default=False)
+    objects = EmpleadoManager()
 
     def __str__(self):
         return f"{self.postulante.__str__()}"
