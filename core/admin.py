@@ -39,7 +39,7 @@ class EmpleadoAdmin(admin.ModelAdmin):
 admin_custom.register(Empleado, EmpleadoAdmin)
 
 class ClienteAdmin(admin.ModelAdmin):
-    fields = ["username", "password", "nombre", "apellido", "mail", "cuit", "domicilio"]
+    fields = ["username", "password", "first_name", "last_name", "email", "cuit", "domicilio"]
 
 admin_custom.register(Cliente, ClienteAdmin)
 
