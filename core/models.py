@@ -95,12 +95,6 @@ class Sucursal(models.Model):
 class Persona(User):
     '''Clase abstracta para heredar atributos de User'''
     baja = models.BooleanField(default=False)
-
-    def __init__(self):
-        super(Persona, self).__init__()
-        self.first_name = models.CharField(max_length=100, verbose_name='Nombre')
-        self.last_name = models.CharField(max_length=150, verbose_name='Apellido')
-        self.email = models.EmailField(max_length=150, verbose_name='Mail')
     
     def __str__(self):
         return f"{self.last_name}, {self.first_name}"
