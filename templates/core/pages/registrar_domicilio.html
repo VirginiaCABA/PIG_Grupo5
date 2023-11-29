@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+
+{% load static %} 
+
+{% block links %} 
+    <link rel="stylesheet" href="{% static 'core/styles/cliente.css' %}">
+{% endblock %} 
+
+{% block content %}
+
+    <div class="container">
+        <form action="" method="post" class="login-form">
+            <h2>Primero, necesitamos los datos de tu domicilio..</h2>
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit">Continuar</button>
+        </form>
+    </div>
+
+{% endblock %}

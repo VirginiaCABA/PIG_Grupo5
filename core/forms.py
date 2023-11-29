@@ -30,7 +30,7 @@ def validar_mail(value):
 
 class ContactoForm(forms.Form):
     """Devuelve el formulario de contactos"""
-    nombre = forms.CharField(
+    first_name = forms.CharField(
         label='Nombre',
         max_length=50,
         required=True,
@@ -38,7 +38,7 @@ class ContactoForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control',
                                       'placeholder': 'Solo letras'})
     )
-    apellido = forms.CharField(
+    last_name = forms.CharField(
         label='Apellido',
         max_length=50,
         required=True,
@@ -55,7 +55,7 @@ class ContactoForm(forms.Form):
                                        'type':'number',
                                        'placeholder': 'Solo números'})
     )
-    mail = forms.EmailField(
+    email = forms.EmailField(
         label='Email',
         max_length=100,
         required=True,
@@ -83,13 +83,10 @@ class PedidoForm(ModelForm):
     piso = forms.CharField(label="Piso", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
     departamento = forms.CharField(label='Departamento', max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solo letras'}))
     cp = forms.CharField(label="cp", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
-    latitud = forms.CharField(label="latitud", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
-    longitud = forms.CharField(label="longitud", widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo números'}))
-
 
     class Meta:
         model = Pedido
-        fields=['provincia','localidad','calle','numero','piso','departamento','cp','latitud','longitud']   
+        fields=['provincia','localidad','calle','numero','piso','departamento','cp']   
 
 
 class PaqueteForm(ModelForm):
@@ -151,15 +148,24 @@ class PaqueteForm(ModelForm):
         else:
             raise forms.ValidationError('Este campo es requerido.')
 
+
+class DomicilioForm(ModelForm):
+
+    class Meta:
+        model = Domicilio
+        fields = ['calle', 'numero', 'piso', 'departamento', 'localidad', 'cp']
+        exclude = ['baja']
+        
 class ClienteForm(ModelForm):
 
     password = forms.CharField(widget=forms.PasswordInput)
 
-    def clean_mail(self):
-        if User.objects.filter(username=self.cleaned_data['mail']).exists():
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
             raise ValidationError("El cliente ya está registrado")
-        return self.cleaned_data['mail']
+        return email
     
     class Meta:
         model = Cliente
-        fields = ['mail', 'password', 'nombre', 'apellido', 'cuit', 'domicilio']
+        fields = ['email', 'password', 'first_name', 'last_name', 'cuit', 'domicilio']

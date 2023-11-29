@@ -12,8 +12,31 @@ class CustomAdmin(admin.AdminSite):
 admin_custom = CustomAdmin(name = 'LogisticaAdmin')
 
 # Register your models here.
-admin_custom.register([Provincia, Localidad, Domicilio, Sucursal, Empleado])
 
+class ProvinciaAdmin(admin.ModelAdmin):
+    exclude = ['baja']
+
+admin_custom.register(Provincia, ProvinciaAdmin)
+
+class LocalidadAdmin(admin.ModelAdmin):
+    exclude = ['baja']
+
+admin_custom.register(Localidad, LocalidadAdmin)
+
+class DomicilioAdmin(admin.ModelAdmin):
+    exclude = ['baja']
+
+admin_custom.register(Domicilio, DomicilioAdmin)
+
+class SucursalAdmin(admin.ModelAdmin):
+    exclude = ['baja']
+
+admin_custom.register(Sucursal, SucursalAdmin)
+
+class EmpleadoAdmin(admin.ModelAdmin):
+    exclude = ['baja']
+
+admin_custom.register(Empleado, EmpleadoAdmin)
 
 class ClienteAdmin(admin.ModelAdmin):
     fields = ["username", "password", "nombre", "apellido", "mail", "cuit", "domicilio"]
